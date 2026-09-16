@@ -109,7 +109,9 @@
       mechanism: "Ashwagandha exerts intrinsic GABA-mimetic central nervous system calming activity. Co-administration potentiates sedative and hypnotic effects.",
       clinicalRisk: "Severe drowsiness, profound motor impairment, respiratory depression, and fall risk.",
       recommendation: "Avoid concurrent ingestion. Do not operate machinery or drive if both have been consumed.",
-      hindiWarning: "अश्वगंधा और नींद/डिप्रेशन की दवाओं (जैसे अल्प्रैजोलम, क्लोनाजेपाम) को एक साथ न लें। इससे अत्यधिक बेहोशी और सांस लेने में कठिनाई हो सकती है।"
+      hindiWarning: "अश्वगंधा और नींद/डिप्रेशन की दवाओं (जैसे अल्प्रैजोलम, क्लोनाजेपाम) को एक साथ न लें। इससे अत्यधिक बेहोशी और सांस लेने में कठिनाई हो सकती है।",
+      evidenceLevel: "Established",
+      source: "Ayush Research Portal / NIH NCCIH"
     },
     {
       id: "aahi-002",
@@ -121,7 +123,9 @@
       mechanism: "Ashwagandha enhances cellular insulin sensitivity and glucose uptake. Combined with prescription antidiabetics, synergistic blood sugar drop can occur.",
       clinicalRisk: "Tremors, cold sweats, confusion, dizzy spells, or acute hypoglycemic shock.",
       recommendation: "Monitor blood glucose levels frequently. Report hypoglycemic episodes to your endocrinologist.",
-      hindiWarning: "डायबिटीज की दवाओं के साथ अश्वगंधा लेने से शुगर का स्तर खतरनाक रूप से गिर सकता है (हाइपोग्लाइसीमिया)। नियमित शुगर चेक करें।"
+      hindiWarning: "डायबिटीज की दवाओं के साथ अश्वगंधा लेने से शुगर का स्तर खतरनाक रूप से गिर सकता है (हाइपोग्लाइसीमिया)। नियमित शुगर चेक करें।",
+      evidenceLevel: "Moderate Evidence",
+      source: "Ayush Research Portal"
     },
     {
       id: "aahi-003",
@@ -133,7 +137,9 @@
       mechanism: "Ashwagandha stimulates endogenous T3 and T4 hormone synthesis. May unbalance controlled hypothyroid patients on replacement therapy.",
       clinicalRisk: "Palpitations, tremors, anxiety, heat intolerance, and insomnia.",
       recommendation: "Monitor serum TSH, free T3, and free T4 every 4-6 weeks if taking both.",
-      hindiWarning: "थायराइड की दवा (Thyronorm/Eltroxin) के साथ अश्वगंधा लेने से थायराइड हार्मोन बढ़ सकता है और घबराहट हो सकती है।"
+      hindiWarning: "थायराइड की दवा (Thyronorm/Eltroxin) के साथ अश्वगंधा लेने से थायराइड हार्मोन बढ़ सकता है और घबराहट हो सकती है।",
+      evidenceLevel: "Moderate Evidence",
+      source: "Journal of Ayurveda & Integrative Medicine"
     },
     {
       id: "aahi-004",
@@ -145,7 +151,9 @@
       mechanism: "Giloy exhibits potent insulinomimetic and gluconeogenesis-inhibiting actions.",
       clinicalRisk: "Precipitous drops in capillary blood glucose, particularly in elderly diabetic patients.",
       recommendation: "Avoid concentrated decoctions (Kadha) alongside peak-acting sulfonylureas without medical advice.",
-      hindiWarning: "गिलोय का काढ़ा डायबिटीज की दवाओं के असर को बहुत तेज कर सकता है जिससे अचानक चक्कर व कमजोरी आ सकती है।"
+      hindiWarning: "गिलोय का काढ़ा डायबिटीज की दवाओं के असर को बहुत तेज कर सकता है जिससे अचानक चक्कर व कमजोरी आ सकती है।",
+      evidenceLevel: "Moderate Evidence",
+      source: "Ayush Research Portal"
     },
     {
       id: "aahi-005",
@@ -157,7 +165,9 @@
       mechanism: "Giloy is a strong immunomodulator stimulating macrophage activity and lymphocyte proliferation, directly opposing drug-induced therapeutic immunosuppression.",
       clinicalRisk: "Flare-ups of autoimmune disease (e.g. Rheumatoid Arthritis, Lupus) or graft compromise.",
       recommendation: "Contraindicated in transplant recipients and patients receiving active immunosuppressive therapies.",
-      hindiWarning: "गिलोय रोग प्रतिरोधक क्षमता को अत्यधिक सक्रिय करता है, जिससे स्टेरॉयड और ऑटोइम्यून दवाओं का असर समाप्त हो सकता है।"
+      hindiWarning: "गिलोय रोग प्रतिरोधक क्षमता को अत्यधिक सक्रिय करता है, जिससे स्टेरॉयड और ऑटोइम्यून दवाओं का असर समाप्त हो सकता है।",
+      evidenceLevel: "Established",
+      source: "Pharmacognosy Reviews"
     },
     {
       id: "aahi-006",
@@ -169,7 +179,9 @@
       mechanism: "Guggulsterones inhibit platelet aggregation. Combined with allopathic blood thinners, clotting time is significantly extended.",
       clinicalRisk: "Unexplained bruising, epistaxis (nosebleeds), gastrointestinal bleeding, hematuria.",
       recommendation: "Avoid concurrent use. Discontinue Guggulu at least 14 days prior to any planned surgery or dental procedure.",
-      hindiWarning: "खून पतला करने वाली दवाओं (Ecosprin, Warfarin) के साथ गुग्गुल लेने से रक्तस्राव (ब्लीडिंग) का खतरा बहुत बढ़ जाता है।"
+      hindiWarning: "खून पतला करने वाली दवाओं (Ecosprin, Warfarin) के साथ गुग्गुल लेने से रक्तस्राव (ब्लीडिंग) का खतरा बहुत बढ़ जाता है।",
+      evidenceLevel: "Established",
+      source: "Natural Medicines Comprehensive Database"
     },
     {
       id: "aahi-007",
@@ -181,7 +193,9 @@
       mechanism: "Guggulu can modulate CYP3A4 enzymes and hepatic transporters, altering bioavailability and clearance of statins.",
       clinicalRisk: "Altered statin efficacy or increased hepatic transaminase elevations and myopathy risk.",
       recommendation: "Routine liver function tests (LFT) and creatine kinase monitoring recommended.",
-      hindiWarning: "कोलेस्ट्रॉल कम करने वाली स्टेटिन दवाओं के साथ गुग्गुल लेने पर लिवर एंजाइम्स की नियमित जांच कराएं।"
+      hindiWarning: "कोलेस्ट्रॉल कम करने वाली स्टेटिन दवाओं के साथ गुग्गुल लेने पर लिवर एंजाइम्स की नियमित जांच कराएं।",
+      evidenceLevel: "Moderate Evidence",
+      source: "Ayush Research Portal"
     },
     {
       id: "aahi-008",
@@ -193,7 +207,9 @@
       mechanism: "Glycyrrhizin inhibits 11-beta-hydroxysteroid dehydrogenase type 2, resulting in cortisol-induced mineralocorticoid receptor activation.",
       clinicalRisk: "Sodium retention, severe hypokalemia (dangerously low potassium), cardiac arrhythmia, and rebound hypertension.",
       recommendation: "Hypertensive and cardiac patients must avoid regular or large doses of Mulethi.",
-      hindiWarning: "हाई ब्लड प्रेशर और पेशाब बढ़ाने वाली दवाओं के साथ मुलेठी न लें। यह ब्लड प्रेशर बढ़ा सकती है और शरीर में पोटैशियम कम कर सकती है।"
+      hindiWarning: "हाई ब्लड प्रेशर और पेशाब बढ़ाने वाली दवाओं के साथ मुलेठी न लें। यह ब्लड प्रेशर बढ़ा सकती है और शरीर में पोटैशियम कम कर सकती है।",
+      evidenceLevel: "Established",
+      source: "NIH NCCIH"
     },
     {
       id: "aahi-009",
@@ -205,7 +221,9 @@
       mechanism: "Charantin and peptide-P stimulate peripheral glucose disposal and pancreatic insulin secretion.",
       clinicalRisk: "Nocturnal hypoglycemia, diaphoresis, acute neuroglycopenia.",
       recommendation: "Dose adjustments of prescription antidiabetics may be required under endocrinologist supervision.",
-      hindiWarning: "करेला-जामुन जूस और एलोपैथिक शुगर की गोलियां एक साथ लेने पर शुगर अचानक बहुत कम हो सकती है।"
+      hindiWarning: "करेला-जामुन जूस और एलोपैथिक शुगर की गोलियां एक साथ लेने पर शुगर अचानक बहुत कम हो सकती है।",
+      evidenceLevel: "Moderate Evidence",
+      source: "Phytomedicine Journal"
     },
     {
       id: "aahi-010",
@@ -217,7 +235,9 @@
       mechanism: "Co-administration significantly decreases plasma concentrations and steady-state AUC of phenytoin.",
       clinicalRisk: "Breakthrough epileptic seizures due to sub-therapeutic antiepileptic drug levels.",
       recommendation: "Strictly avoid Shankhpushpi preparations in patients on therapeutic antiepileptic regimens.",
-      hindiWarning: "मिर्गी / दौरे की दवाओं (Eptoin, Phenytoin) के साथ शंखपुष्पी कभी न लें। इससे दौरे दोबारा शुरू हो सकते हैं।"
+      hindiWarning: "मिर्गी / दौरे की दवाओं (Eptoin, Phenytoin) के साथ शंखपुष्पी कभी न लें। इससे दौरे दोबारा शुरू हो सकते हैं।",
+      evidenceLevel: "Established",
+      source: "Epilepsia Research"
     },
     {
       id: "aahi-011",
@@ -229,7 +249,9 @@
       mechanism: "Polyphenols and high tannin content in Haritaki/Amalaki form insoluble complexes with ferric and ferrous ions in the gut lumen.",
       clinicalRisk: "Therapeutic failure of iron deficiency anemia treatment.",
       recommendation: "Separate administration by at least 3 to 4 hours.",
-      hindiWarning: "त्रिफला और आयरन/खून की गोलियों को एक साथ न लें। दोनों के बीच कम से कम 3 से 4 घंटे का अंतर रखें।"
+      hindiWarning: "त्रिफला और आयरन/खून की गोलियों को एक साथ न लें। दोनों के बीच कम से कम 3 से 4 घंटे का अंतर रखें।",
+      evidenceLevel: "Moderate Evidence",
+      source: "Ayush Research Portal"
     },
     {
       id: "aahi-012",
@@ -241,7 +263,9 @@
       mechanism: "Curcumin possesses mild thromboxane A2 inhibition and anti-inflammatory synergy.",
       clinicalRisk: "Increased tendency for bruising and gastrointestinal irritation when taken with high-dose NSAIDs.",
       recommendation: "Avoid high-dose curcumin extract capsules alongside prescription blood thinners without clinical oversight.",
-      hindiWarning: "दर्द निवारक दवाओं और खून पतला करने वाली गोलियों के साथ अत्यधिक हल्दी सप्लीमेंट्स लेने से पेट में जलन व ब्लीडिंग का जोखिम हो सकता है।"
+      hindiWarning: "दर्द निवारक दवाओं और खून पतला करने वाली गोलियों के साथ अत्यधिक हल्दी सप्लीमेंट्स लेने से पेट में जलन व ब्लीडिंग का जोखिम हो सकता है।",
+      evidenceLevel: "Theoretical / In Vitro",
+      source: "NIH NCCIH"
     }
   ];
 

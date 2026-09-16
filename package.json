@@ -1,6 +1,6 @@
 {
-  "name": "smart-patient",
-  "version": "2.1.0",
+  "name": "smart-patient-india",
+  "version": "3.0.0",
   "description": "Smart Medicine Awareness & Safety Platform — Patient Health Literacy & DDI Risk Analysis",
   "main": "js/app.js",
   "scripts": {

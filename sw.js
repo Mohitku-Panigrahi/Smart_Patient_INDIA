@@ -4,19 +4,22 @@
  * Caches HTML, CSS, JS, and data/medicines.json for 100% offline availability.
  */
 
-const CACHE_NAME = 'smasp-static-v2';
+const CACHE_NAME = 'smasp-india-v3';
 
 const CORE_ASSETS = [
   './',
-  './app.html',
-  './medicine.html',
-  './app.css',
-  './app.js',
+  './index.html',
   './manifest.json',
   './data/medicines.json',
-  './index.html',
-  './result.html',
-  './style.css'
+  './data/adr_model_weights.json',
+  './js/engine/smaspEngine.js',
+  './js/engine/adrPredictor.js',
+  './js/engine/riskEngine.js',
+  './js/engine/logger.js',
+  './js/data/indianPharma.js',
+  './js/data/ayurvedaAllopathy.js',
+  './js/data/conditions.js',
+  './js/data/i18n.js'
 ];
 
 // Install Event: Cache Core Assets
@@ -71,7 +74,7 @@ self.addEventListener('fetch', (event) => {
       }).catch(() => {
         // Fallback for HTML navigations when completely offline
         if (event.request.headers.get('accept')?.includes('text/html')) {
-          return caches.match('./app.html');
+          return caches.match('./index.html');
         }
       });
     })

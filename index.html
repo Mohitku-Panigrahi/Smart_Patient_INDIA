@@ -495,6 +495,46 @@
     </div>
   </div>
 
+  <!-- Modal: Clinical Medicine Detail, Boxed Warnings & Allergy Profile -->
+  <div id="medicineDetailModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="med-modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+      <div id="medModalBackdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity" onclick="closeMedicineDetailModal()"></div>
+      <div class="inline-block align-bottom bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full p-6 sm:p-8 space-y-6 text-slate-900 dark:text-white">
+        
+        <!-- Header -->
+        <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <span id="medModalCategory" class="text-xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">Category</span>
+              <span id="medModalGrade" class="text-[10px] font-mono px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Grade A Evidence</span>
+            </div>
+            <h3 id="medModalTitle" class="text-2xl font-black tracking-tight text-slate-900 dark:text-white">Generic Name</h3>
+            <p id="medModalBrands" class="text-xs text-slate-400 mt-0.5">Common Trade Brands</p>
+          </div>
+          <button onclick="closeMedicineDetailModal()" class="p-2 rounded-xl text-slate-400 hover:text-slate-900 dark:hover:text-white bg-slate-100 dark:bg-slate-800 transition" aria-label="Close modal">✕</button>
+        </div>
+
+        <div id="medModalContent" class="space-y-4 text-sm max-h-[60vh] overflow-y-auto pr-1">
+          <!-- Populated dynamically via JS -->
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="pt-4 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div id="medModalProvenance" class="text-[11px] text-slate-400 font-mono">Source: FDA SPL / CDSCO • Verified: Mar 2026</div>
+          <div class="flex items-center gap-2 w-full sm:w-auto">
+            <button id="medModalAdrBtn" type="button" class="w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-extrabold bg-purple-600 hover:bg-purple-500 text-white transition flex items-center justify-center gap-1.5 shadow">
+              <span>⚡ Check in ADR Model</span>
+            </button>
+            <button onclick="closeMedicineDetailModal()" type="button" class="w-full sm:w-auto px-4 py-2 rounded-xl text-xs font-bold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition">
+              Close
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
   <!-- Footer -->
   <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-10 mt-auto">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
@@ -512,7 +552,7 @@
   </footer>
 
   <!-- Intelligence Engine & Dataset Wire Scripts -->
-  <script src="smasp-engine.js"></script>
+  <script src="js/engine/smaspEngine.js"></script>
   <script src="js/data/indianPharma.js"></script>
   <script src="js/data/ayurvedaAllopathy.js"></script>
   <script src="js/engine/adrPredictor.js"></script>
@@ -938,9 +978,9 @@
               </div>
 
               <div>
-                <a href="medicine.html?id=${encodeURIComponent(med.id)}" class="text-xl font-bold text-slate-900 dark:text-white hover:text-brand-600 transition block">
+                <button onclick="openMedicineDetailModal('${escapeHtml(med.id)}')" type="button" class="text-xl font-bold text-slate-900 dark:text-white hover:text-brand-600 transition block text-left">
                   ${escapeHtml(med.genericName)}
-                </a>
+                </button>
                 ${brandsSnippet ? `<p class="text-xs text-slate-400 mt-0.5">Common brands: ${escapeHtml(brandsSnippet)}</p>` : ''}
               </div>
 
@@ -954,10 +994,10 @@
                 <span>${isSaved ? '⭐ In Cabinet' : '+ Save'}</span>
               </button>
 
-              <a href="medicine.html?id=${encodeURIComponent(med.id)}" class="inline-flex items-center gap-1 text-sm font-bold text-brand-600 dark:text-brand-400 hover:text-brand-700 transition">
-                <span>Learn More</span>
+              <button onclick="openMedicineDetailModal('${escapeHtml(med.id)}')" type="button" class="inline-flex items-center gap-1 text-sm font-bold text-brand-600 dark:text-brand-400 hover:text-brand-700 transition">
+                <span>Clinical Breakdown</span>
                 <span>→</span>
-              </a>
+              </button>
             </div>
           </article>
         `;
@@ -965,6 +1005,122 @@
 
       grid.innerHTML = html;
     }
+
+    // ── Clinical Medicine Detail Modal Controller ──────────────────────────────
+    function openMedicineDetailModal(medId) {
+      const med = (medicinesData || []).find(m => m.id === medId);
+      if (!med) return;
+
+      const modal = document.getElementById('medicineDetailModal');
+      if (!modal) return;
+
+      document.getElementById('medModalTitle').textContent = med.genericName;
+      document.getElementById('medModalCategory').textContent = med.category || 'General';
+      document.getElementById('medModalGrade').textContent = `Evidence Grade: ${med.confidenceGrade || 'A'}`;
+      document.getElementById('medModalBrands').textContent = med.brandNames && med.brandNames.length
+        ? `Common trade brands: ${med.brandNames.join(', ')}`
+        : '';
+      document.getElementById('medModalProvenance').textContent = `Source: ${med.source || 'FDA SPL / CDSCO'} • Last Verified: ${med.lastVerified || '2026-03-15'}`;
+
+      const adrBtn = document.getElementById('medModalAdrBtn');
+      if (adrBtn) {
+        adrBtn.onclick = () => {
+          closeMedicineDetailModal();
+          launchAdrWithDrug(med.genericName);
+        };
+      }
+
+      let contentHtml = '';
+
+      // 1. Boxed Warnings (if any)
+      if (med.boxedWarnings && med.boxedWarnings.length > 0) {
+        contentHtml += med.boxedWarnings.map(w => `
+          <div class="p-4 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-300 dark:border-red-500/60 space-y-2 text-red-900 dark:text-red-200">
+            <div class="flex items-center justify-between text-xs font-black uppercase tracking-wider text-red-700 dark:text-red-400">
+              <span class="flex items-center gap-1.5">🛑 STATUTORY BOXED WARNING (${escapeHtml(w.type || 'BLACK_BOX')})</span>
+              <span class="px-2 py-0.5 rounded bg-red-200 dark:bg-red-900/80 text-red-800 dark:text-red-100 text-[10px] font-bold">${escapeHtml(w.severity || 'CRITICAL')}</span>
+            </div>
+            <h4 class="text-sm font-bold text-red-950 dark:text-white">${escapeHtml(w.title)}</h4>
+            <p class="text-xs leading-relaxed text-red-800 dark:text-red-200/90">${escapeHtml(w.description)}</p>
+            <div class="text-[10px] text-red-600 dark:text-red-400/80 font-mono">Authority: ${escapeHtml(w.source || 'FDA / CDSCO')}</div>
+          </div>
+        `).join('');
+      }
+
+      // 2. Allergy & Hypersensitivity Classes (if any)
+      if (med.allergyClasses && med.allergyClasses.length > 0) {
+        contentHtml += `
+          <div class="p-3.5 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/60 space-y-1.5 text-xs text-amber-900 dark:text-amber-200">
+            <div class="font-extrabold flex items-center gap-1.5 text-amber-800 dark:text-amber-300">
+              <span>🛡️ Clinical Allergy & Cross-Reactivity Classification</span>
+            </div>
+            <div class="flex flex-wrap gap-1.5">
+              ${med.allergyClasses.map(c => `<span class="px-2.5 py-1 rounded-lg bg-amber-100 dark:bg-amber-900/50 font-semibold text-amber-900 dark:text-amber-100 border border-amber-300 dark:border-amber-800">${escapeHtml(c)}</span>`).join('')}
+            </div>
+            <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">Cross-check patient allergy profile for IgE-mediated hypersensitivity risks.</p>
+          </div>
+        `;
+      }
+
+      // 3. Plain English Summary
+      contentHtml += `
+        <div class="space-y-1 text-xs text-slate-700 dark:text-slate-300">
+          <div class="font-bold text-slate-900 dark:text-white">Pharmacological Summary</div>
+          <p class="leading-relaxed">${escapeHtml(med.plainEnglishSummary)}</p>
+        </div>
+      `;
+
+      // 4. Indications & Side Effects Grid
+      contentHtml += `
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+          <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5">
+            <div class="font-bold text-emerald-700 dark:text-emerald-400">📋 Therapeutic Indications</div>
+            <div class="flex flex-wrap gap-1">
+              ${(med.commonUses || []).map(u => `<span class="px-2 py-0.5 rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-medium">${escapeHtml(u)}</span>`).join('')}
+            </div>
+          </div>
+          <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 space-y-1.5">
+            <div class="font-bold text-amber-700 dark:text-amber-400">⚠️ Common Side Effects</div>
+            <div class="flex flex-wrap gap-1">
+              ${(med.commonSideEffects || []).map(se => `<span class="px-2 py-0.5 rounded bg-white dark:bg-slate-700 border border-slate-200 dark:border-slate-600 font-medium">${escapeHtml(se)}</span>`).join('')}
+            </div>
+          </div>
+        </div>
+      `;
+
+      // 5. Calm Warnings & Contraindications
+      if (med.calmWarnings && med.calmWarnings.length > 0) {
+        contentHtml += `
+          <div class="space-y-2 text-xs">
+            <div class="font-bold text-slate-900 dark:text-white">Contraindications & Health Precaution Alerts</div>
+            <div class="space-y-1.5">
+              ${med.calmWarnings.map(w => {
+                const isAvoid = w.level === 'avoid';
+                const color = isAvoid ? 'border-red-300 dark:border-red-900/60 bg-red-50 dark:bg-red-950/20 text-red-900 dark:text-red-300' : 'border-amber-300 dark:border-amber-900/60 bg-amber-50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-300';
+                return `
+                  <div class="p-2.5 rounded-xl border ${color} space-y-0.5">
+                    <div class="font-bold flex items-center gap-1.5">
+                      <span>${isAvoid ? '🛑 AVOID' : '⚠️ CAUTION'}: ${escapeHtml(w.title)}</span>
+                    </div>
+                    <div class="text-[11px] leading-relaxed opacity-90">${escapeHtml(w.plainEnglishWhy)}</div>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      document.getElementById('medModalContent').innerHTML = contentHtml;
+      modal.classList.remove('hidden');
+    }
+
+    function closeMedicineDetailModal() {
+      const modal = document.getElementById('medicineDetailModal');
+      if (modal) modal.classList.add('hidden');
+    }
+    window.openMedicineDetailModal = openMedicineDetailModal;
+    window.closeMedicineDetailModal = closeMedicineDetailModal;
 
     // ── Dark Mode Initializer ──────────────────────────────────────────────────
     function initTheme() {

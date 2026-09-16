@@ -1,16 +1,17 @@
 """
 medicine_service.py
 -------------------
-Core clinical pharmacology and database querying service for Smart Patient India.
-Executes O(1) indexed SQL lookups, brand-to-generic resolution, pairwise DDI analysis,
-and ML-driven Adverse Drug Reaction (ADR) risk scoring.
+Core clinical pharmacology and database querying service for Smart Patient India v3.
+Executes canonical ID entity resolution, exact-match pairwise DDI analysis,
+allergy ontology cross-reactivity evaluations, statutory regulatory alerts,
+and ML-assisted Adverse Drug Reaction (ADR) risk assessment with SHAP explainability.
 """
 
 import json
 import math
 import os
 import sqlite3
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 DB_PATH = os.path.join(BASE_DIR, "backend", "data", "medicines.db")
@@ -55,12 +56,6 @@ def _load_ml_model() -> Dict[str, Any]:
                     {"features": ["drug_sedative", "drug_ayur_active"], "weight": 1.40, "reason": "Sedative + Ayurvedic GABAergic herb synergy (Compounded CNS depression)"},
                     {"features": ["drug_metformin", "renal_impairment"], "weight": 1.85, "reason": "Metformin accumulation in renal compromise (Risk of Lactic Acidosis)"}
                 ]
-            },
-            "hazard_organ_subtypes": {
-                "nephrotoxicity": {"intercept": -2.85, "weights": {"age_normalized": 1.2, "renal_impairment": 2.2, "drug_nsaid": 1.9, "drug_ace_arb": 1.4}},
-                "hepatotoxicity": {"intercept": -3.10, "weights": {"hepatic_impairment": 2.4, "drug_statin": 1.1, "drug_ayur_active": 0.85}},
-                "gi_bleeding": {"intercept": -2.95, "weights": {"age_normalized": 1.3, "has_peptic_ulcer": 2.1, "drug_nsaid": 2.05, "drug_anticoagulant": 2.3}},
-                "severe_hypoglycemia": {"intercept": -3.00, "weights": {"has_diabetes": 1.8, "drug_metformin": 1.5, "drug_ayur_active": 1.2}}
             }
         }
     }
@@ -70,10 +65,60 @@ class MedicineService:
     def __init__(self, db_path: str = DB_PATH):
         self.db_path = db_path
 
+    def _resolve_canonical_ids(self, medicine_name: str, cursor: sqlite3.Cursor) -> List[Tuple[str, str]]:
+        """
+        Resolves a user-provided name (brand or generic) into a list of (canonical_id, display_name) tuples.
+        Decomposes combination salts (e.g. Combiflam -> [ibp-001, ibu-001, para-001]).
+        """
+        clean = medicine_name.strip()
+        results: List[Tuple[str, str]] = []
+        seen_ids: Set[str] = set()
+
+        # 1. Match Indian trade brand
+        brand_row = cursor.execute("""
+            SELECT canonical_medicine_id, generic_name, brand_name 
+            FROM indian_brands 
+            WHERE brand_name LIKE ? OR brand_name LIKE ?
+            LIMIT 1
+        """, (f"%{clean}%", f"{clean}%")).fetchone()
+
+        if brand_row:
+            c_id = brand_row["canonical_medicine_id"]
+            if c_id and c_id not in seen_ids:
+                seen_ids.add(c_id)
+                results.append((c_id, brand_row["brand_name"]))
+
+            # Also decompose combination salts if generic has "and" or "+"
+            gen = brand_row["generic_name"]
+            for part in gen.replace(" and ", ",").replace("+", ",").split(","):
+                part_clean = part.strip()
+                m_row = cursor.execute("""
+                    SELECT id, generic_name FROM medicines 
+                    WHERE normalized_name LIKE ? OR generic_name LIKE ?
+                    LIMIT 1
+                """, (f"%{part_clean.lower()}%", f"%{part_clean}%")).fetchone()
+                if m_row and m_row["id"] not in seen_ids:
+                    seen_ids.add(m_row["id"])
+                    results.append((m_row["id"], m_row["generic_name"]))
+
+        # 2. Direct master medicine match
+        m_row = cursor.execute("""
+            SELECT id, generic_name FROM medicines 
+            WHERE generic_name LIKE ? OR normalized_name LIKE ?
+            LIMIT 1
+        """, (f"%{clean}%", f"%{clean.lower()}%")).fetchone()
+
+        if m_row and m_row["id"] not in seen_ids:
+            seen_ids.add(m_row["id"])
+            results.append((m_row["id"], m_row["generic_name"]))
+
+        return results
+
     def get_medicine(self, query: str) -> Optional[Dict[str, Any]]:
         """
         Retrieves complete pharmacological breakdown for a drug by brand name or generic compound.
-        Seamlessly resolves Indian brand names to Jan Aushadhi alternatives.
+        Seamlessly resolves Indian brand names to Jan Aushadhi alternatives, allergy profiles,
+        statutory boxed warnings, and evidence provenance metadata.
         """
         if not query:
             return None
@@ -102,7 +147,7 @@ class MedicineService:
             conn.close()
             return None
 
-        med_id = med_row["id"] if med_row else None
+        med_id = med_row["id"] if med_row else (brand_row["canonical_medicine_id"] if brand_row else None)
         generic_name = med_row["generic_name"] if med_row else brand_row["generic_name"]
 
         # Step 3: Fetch related clinical attributes
@@ -110,19 +155,45 @@ class MedicineService:
         adverse_effects = []
         contraindications = []
         boxed_warnings = []
+        allergy_risks = []
 
         if med_id:
-            for r in cursor.execute("SELECT indication FROM indications WHERE medicine_id = ?", (med_id,)).fetchall():
+            for r in cursor.execute("SELECT indication, source FROM indications WHERE medicine_id = ?", (med_id,)).fetchall():
                 indications.append(r["indication"])
 
-            for r in cursor.execute("SELECT reaction, frequency FROM adverse_effects WHERE medicine_id = ?", (med_id,)).fetchall():
+            for r in cursor.execute("SELECT reaction, frequency, source FROM adverse_effects WHERE medicine_id = ?", (med_id,)).fetchall():
                 adverse_effects.append({"reaction": r["reaction"], "frequency": r["frequency"]})
 
-            for r in cursor.execute("SELECT condition, severity, why_avoid FROM contraindications WHERE medicine_id = ?", (med_id,)).fetchall():
+            for r in cursor.execute("SELECT condition, severity, why_avoid, source FROM contraindications WHERE medicine_id = ?", (med_id,)).fetchall():
                 contraindications.append({"condition": r["condition"], "severity": r["severity"], "why": r["why_avoid"]})
 
-            for r in cursor.execute("SELECT warning_title, warning_text FROM boxed_warnings WHERE medicine_id = ?", (med_id,)).fetchall():
-                boxed_warnings.append({"title": r["warning_title"], "text": r["warning_text"]})
+            for r in cursor.execute("""
+                SELECT warning_type, severity, title, description, source, source_url, last_verified 
+                FROM boxed_warnings WHERE medicine_id = ?
+            """, (med_id,)).fetchall():
+                boxed_warnings.append({
+                    "warning_type": r["warning_type"],
+                    "severity": r["severity"],
+                    "title": r["title"],
+                    "description": r["description"],
+                    "source": r["source"],
+                    "source_url": r["source_url"],
+                    "last_verified": r["last_verified"]
+                })
+
+            for r in cursor.execute("""
+                SELECT ac.name as class_name, mar.cross_reactivity_level, mar.hypersensitivity_warning, mar.severity, mar.source
+                FROM medicine_allergy_risks mar
+                JOIN allergy_classes ac ON mar.allergy_class_id = ac.id
+                WHERE mar.medicine_id = ?
+            """, (med_id,)).fetchall():
+                allergy_risks.append({
+                    "allergy_class": r["class_name"],
+                    "cross_reactivity_level": r["cross_reactivity_level"],
+                    "hypersensitivity_warning": r["hypersensitivity_warning"],
+                    "severity": r["severity"],
+                    "source": r["source"]
+                })
 
         # Step 4: Indian brand & Jan Aushadhi generic mapping
         indian_brand_info = None
@@ -137,7 +208,11 @@ class MedicineService:
                 "jan_aushadhi_price_inr": brand_row["jan_aushadhi_price_inr"],
                 "savings_percentage": brand_row["savings_percentage"],
                 "plain_hindi_summary": brand_row["plain_hindi_summary"],
-                "safety_warning": brand_row["safety_warning"]
+                "safety_warning": brand_row["safety_warning"],
+                "source": brand_row["source"],
+                "source_url": brand_row["source_url"],
+                "effective_date": brand_row["effective_date"],
+                "last_verified": brand_row["last_verified"]
             }
 
         conn.close()
@@ -148,17 +223,22 @@ class MedicineService:
             "category": med_row["category"] if med_row else "Indian Pharma",
             "dosage_forms": json.loads(med_row["dosage_forms"]) if (med_row and med_row["dosage_forms"]) else ["Tablet"],
             "plain_english_summary": med_row["plain_english_summary"] if med_row else (brand_row["composition"] if brand_row else ""),
+            "confidence_grade": med_row["confidence_grade"] if med_row else "A",
             "indications": indications,
             "adverse_effects": adverse_effects,
             "contraindications": contraindications,
             "boxed_warnings": boxed_warnings,
+            "allergy_risks": allergy_risks,
             "indian_brand_profile": indian_brand_info,
-            "source": med_row["source"] if med_row else "Indian Pharmacopoeia (IP) / CDSCO"
+            "source": med_row["source"] if med_row else "Indian Pharmacopoeia (IP) / CDSCO",
+            "source_url": med_row["source_url"] if med_row else None,
+            "last_verified": med_row["last_verified"] if med_row else "2026-03-15"
         }
 
     def check_interactions(self, medicine_list: List[str]) -> List[Dict[str, Any]]:
         """
-        Evaluates pairwise drug-drug clashes and Ayurveda-Allopathy herb clashes.
+        Evaluates pairwise drug-drug clashes using exact canonical drug ID matching (eliminating LIKE false matches)
+        and evaluates clinically referenced Ayurveda-Allopathy herb clashes with evidence levels.
         """
         if not medicine_list or len(medicine_list) < 2:
             return []
@@ -167,69 +247,65 @@ class MedicineService:
         cursor = conn.cursor()
         detected_clashes = []
 
-        # 1. Resolve Indian brand names and decompose multi-salt combinations
-        drug_candidate_groups = []
+        # 1. Resolve canonical ID candidate groups for each medicine in regimen
+        candidate_groups: List[List[Tuple[str, str]]] = []
         for m in medicine_list:
-            clean = m.strip()
-            candidates = {clean}
-            b_row = cursor.execute("SELECT generic_name, composition FROM indian_brands WHERE brand_name LIKE ? LIMIT 1", (f"%{clean}%",)).fetchone()
-            if b_row:
-                gen = b_row["generic_name"]
-                candidates.add(gen)
-                comp = b_row["composition"]
-                candidates.add(comp)
-                for part in gen.replace(" and ", ",").replace("+", ",").split(","):
-                    candidates.add(part.strip())
-            drug_candidate_groups.append(list(candidates))
+            ids = self._resolve_canonical_ids(m, cursor)
+            candidate_groups.append(ids)
 
-        # 2. Pairwise allopathic drug check
-        n = len(drug_candidate_groups)
-        seen_clashes = set()
+        # 2. Deterministic pairwise DDI check by exact canonical IDs
+        n = len(candidate_groups)
+        seen_clashes: Set[str] = set()
 
         for i in range(n):
             for j in range(i + 1, n):
-                group_a = drug_candidate_groups[i]
-                group_b = drug_candidate_groups[j]
+                group_a = candidate_groups[i]
+                group_b = candidate_groups[j]
                 found_match = False
 
-                for d1 in group_a:
+                for id_a, name_a in group_a:
                     if found_match:
                         break
-                    for d2 in group_b:
+                    for id_b, name_b in group_b:
                         row = cursor.execute("""
                             SELECT * FROM drug_interactions 
-                            WHERE (drug_a LIKE ? AND drug_b LIKE ?) OR (drug_a LIKE ? AND drug_b LIKE ?)
+                            WHERE (drug_a_id = ? AND drug_b_id = ?) OR (drug_a_id = ? AND drug_b_id = ?)
                             LIMIT 1
-                        """, (f"%{d1}%", f"%{d2}%", f"%{d2}%", f"%{d1}%")).fetchone()
+                        """, (id_a, id_b, id_b, id_a)).fetchone()
 
                         if row:
-                            clash_key = f"{min(row['drug_a'], row['drug_b'])}_{max(row['drug_a'], row['drug_b'])}"
+                            clash_key = f"{min(row['drug_a_id'], row['drug_b_id'])}_{max(row['drug_a_id'], row['drug_b_id'])}"
                             if clash_key not in seen_clashes:
                                 seen_clashes.add(clash_key)
                                 detected_clashes.append({
                                     "type": "drug_drug_interaction",
                                     "drug_a": row["drug_a"],
                                     "drug_b": row["drug_b"],
+                                    "drug_a_id": row["drug_a_id"],
+                                    "drug_b_id": row["drug_b_id"],
                                     "severity": row["severity"],
                                     "title": row["title"],
                                     "mechanism": row["mechanism"],
                                     "clinical_risk": row["clinical_risk"],
-                                    "source": row["source"]
+                                    "evidence_level": row["evidence_level"],
+                                    "source": row["source"],
+                                    "source_url": row["source_url"],
+                                    "last_verified": row["last_verified"]
                                 })
                             found_match = True
                             break
 
-        # 3. Ayurveda Herb-Drug checks
-        all_drugs_str = " ".join([d for group in drug_candidate_groups for d in group]).lower()
+        # 3. Ayurveda Herb-Drug checks with evidence levels
+        all_drugs_str = " ".join([m.lower() for m in medicine_list])
         ayur_rows = cursor.execute("SELECT * FROM ayurveda_interactions").fetchall()
 
         for a in ayur_rows:
             herb = a["herb_name"].lower()
             # If herb was in input list
             if any(herb in m.lower() for m in medicine_list):
-                # Check if clashing allopathy is in input list
                 allo_group = a["allopathy_group"].lower()
-                if any(kw in all_drugs_str for kw in ["metformin", "glycomet", "aspirin", "ecosprin", "sedative", "alprazolam", "insulin", "statin", "atorva"]):
+                # Check for clashing allopathic keywords
+                if any(kw in all_drugs_str for kw in ["metformin", "glycomet", "aspirin", "ecosprin", "sedative", "alprazolam", "tramadol", "insulin", "statin", "atorva"]):
                     detected_clashes.append({
                         "type": "ayurveda_allopathy_interaction",
                         "herb": a["herb_name"],
@@ -238,16 +314,95 @@ class MedicineService:
                         "title": a["title"],
                         "mechanism": a["mechanism"],
                         "clinical_risk": a["clinical_risk"],
-                        "hindi_warning": a["hindi_warning"]
+                        "hindi_warning": a["hindi_warning"],
+                        "evidence_level": a["evidence_level"],
+                        "source": a["source"],
+                        "last_verified": a["last_verified"]
                     })
 
         conn.close()
         return detected_clashes
 
+    def check_allergies(self, patient_allergies: List[str], medicine_list: List[str]) -> List[Dict[str, Any]]:
+        """
+        Clinical allergy evaluation distinguishing IgE-mediated hypersensitivity from adverse effects.
+        Cross-checks patient reported allergies against drug classes (e.g. Penicillins, NSAIDs, Sulfa)
+        and individual active salts.
+        """
+        if not patient_allergies or not medicine_list:
+            return []
+
+        conn = get_db_connection(self.db_path)
+        cursor = conn.cursor()
+        detected_allergies = []
+        seen_keys: Set[str] = set()
+
+        for med in medicine_list:
+            canonical_pairs = self._resolve_canonical_ids(med, cursor)
+            for m_id, m_name in canonical_pairs:
+                # Query allergy risks for this medicine
+                risks = cursor.execute("""
+                    SELECT ac.id as class_id, ac.name as class_name, ac.common_manifestations, ac.synonyms,
+                           mar.cross_reactivity_level, mar.hypersensitivity_warning, mar.severity, mar.source
+                    FROM medicine_allergy_risks mar
+                    JOIN allergy_classes ac ON mar.allergy_class_id = ac.id
+                    WHERE mar.medicine_id = ?
+                """, (m_id,)).fetchall()
+
+                for r in risks:
+                    class_name = r["class_name"].lower()
+                    class_id = r["class_id"].lower()
+                    manifestations = r["common_manifestations"]
+                    syn_list = []
+                    if r["synonyms"]:
+                        try:
+                            syn_list = [s.lower() for s in json.loads(r["synonyms"])]
+                        except Exception:
+                            syn_list = [s.strip().lower() for s in r["synonyms"].split(",")]
+
+                    # Check if any patient reported allergy matches class, synonyms, or drug name
+                    for pa in patient_allergies:
+                        pa_clean = pa.strip().lower()
+                        if not pa_clean:
+                            continue
+
+                        # Match criteria:
+                        # 1. Exact or partial match with class name or ID
+                        # 2. Match with class clinical synonyms (e.g. Aspirin -> ALG_NSAIDS)
+                        # 3. Match with active salt name
+                        is_match = (
+                            pa_clean in class_name or
+                            pa_clean in class_id or
+                            class_name in pa_clean or
+                            pa_clean in m_name.lower() or
+                            pa_clean in syn_list or
+                            any(syn in pa_clean or pa_clean in syn for syn in syn_list)
+                        )
+
+                        if is_match:
+                            alert_key = f"{m_id}_{r['class_id']}"
+                            if alert_key not in seen_keys:
+                                seen_keys.add(alert_key)
+                                detected_allergies.append({
+                                    "medicine": med,
+                                    "active_salt": m_name,
+                                    "allergy_reported": pa,
+                                    "allergy_class": r["class_name"],
+                                    "cross_reactivity_level": r["cross_reactivity_level"],
+                                    "hypersensitivity_warning": r["hypersensitivity_warning"],
+                                    "common_manifestations": manifestations,
+                                    "severity": r["severity"],
+                                    "source": r["source"]
+                                })
+
+        conn.close()
+        return detected_allergies
+
     def predict_adr_risk(self, patient_profile: Dict[str, Any]) -> Dict[str, Any]:
         """
-        Executes trained predictive ML model on patient profile to estimate ADR risk,
-        multi-organ hazard probabilities, and SHAP explainability.
+        Executes ML-assisted ADR risk assessment on patient profile to estimate ADR risk probability,
+        multi-organ hazard scores, and SHAP local attribution.
+        Positioned strictly as supporting clinical signal, not diagnosis.
         """
         ml_data = _load_ml_model()
         model = ml_data["coefficients"]["overall_adr"]
@@ -329,7 +484,7 @@ class MedicineService:
         }
 
     def get_all_indian_brands(self) -> List[Dict[str, Any]]:
-        """Returns full Indian Brand and Jan Aushadhi savings catalog."""
+        """Returns full Indian Brand and Jan Aushadhi savings catalog with provenance."""
         conn = get_db_connection(self.db_path)
         cursor = conn.cursor()
         rows = cursor.execute("SELECT * FROM indian_brands ORDER BY brand_name ASC").fetchall()

@@ -1,12 +1,12 @@
 {
-  "name": "SMASP — Smart Patient",
-  "short_name": "SMASP",
-  "description": "Understand your medicines in clear, calm, plain English. Free, offline, private.",
-  "start_url": "./app.html",
+  "name": "Smart Patient India",
+  "short_name": "SMASP India",
+  "description": "Clinical medicine safety, Jan Aushadhi generic intelligence & herb-drug interaction matrix for India.",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
-  "background_color": "#f7fafe",
-  "theme_color": "#0f6fff",
+  "background_color": "#020617",
+  "theme_color": "#0f172a",
   "orientation": "portrait-primary",
   "icons": [
     {

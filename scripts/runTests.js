@@ -6,7 +6,7 @@
 
 const assert = require('assert');
 const riskEngine = require('../js/engine/riskEngine.js');
-const { SmaspEngine, DEFAULT_INTERACTIONS_MATRIX } = require('../smasp-engine.js');
+const { SmaspEngine, DEFAULT_INTERACTIONS_MATRIX } = require('../js/engine/smaspEngine.js');
 const Logger = require('../js/engine/logger.js');
 const medicines = require('../data/medicines.json');
 
