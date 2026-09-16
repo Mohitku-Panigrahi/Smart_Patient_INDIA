@@ -199,3 +199,45 @@ def test_api_indian_brands_endpoint():
     assert data["count"] >= 1
     assert data["brands"][0]["brand_name"] == "Dolo 650"
     assert data["brands"][0]["effective_date"] is not None
+
+def test_multi_ingredient_brand_canonical_decomposition_and_ddi():
+    service = MedicineService()
+    # 1. Pan-D (Pantoprazole + Domperidone) combined with Azithral 500 (Azithromycin)
+    interactions = service.check_interactions(["Pan-D", "Azithral 500"])
+    assert len(interactions) >= 1
+    clash = interactions[0]
+    assert clash["drug_a_id"] == "azi-001"
+    assert clash["drug_b_id"] == "dom-001"
+    assert "QTc Interval" in clash["title"]
+    assert clash["evidence_level"] == "Established"
+    assert clash["last_verified"] == "2026-03-15"
+
+    # 2. Combiflam (Ibuprofen + Paracetamol) combined with Telma 40 (Telmisartan)
+    combiflam_clash = service.check_interactions(["Combiflam", "Telma 40"])
+    assert len(combiflam_clash) >= 1
+    assert any(c["drug_b_id"] == "tel-001" for c in combiflam_clash)
+
+def test_allergy_false_positive_immunity():
+    service = MedicineService()
+    # Ensure NSAID allergy strictly flags NSAIDs, and NEVER falsely flags non-NSAIDs whose descriptions mention NSAIDs
+    non_nsaids = ["Metformin", "Pan-D", "Pantoprazole", "Amlodipine", "Telmisartan", "Paracetamol", "Amoxicillin"]
+    alerts = service.check_allergies(["NSAID", "Aspirin"], non_nsaids)
+    assert len(alerts) == 0, f"False positive allergy detection triggered: {alerts}"
+
+    # Ensure Penicillin allergy strictly flags Penicillins, and NEVER falsely flags non-penicillins
+    non_penicillins = ["Ibuprofen", "Combiflam", "Metformin", "Atorvastatin", "Telmisartan"]
+    pen_alerts = service.check_allergies(["Penicillin"], non_penicillins)
+    assert len(pen_alerts) == 0, f"False positive allergy detection triggered: {pen_alerts}"
+
+def test_provenance_and_explainability_contract():
+    service = MedicineService()
+    interactions = service.check_interactions(["Ibuprofen", "Telmisartan"])
+    assert len(interactions) >= 1
+    rule = interactions[0]
+    # Verify provenance explainability contract
+    assert "mechanism" in rule and len(rule["mechanism"]) > 10
+    assert rule["evidence_level"] in ["Established", "Moderate Evidence", "Theoretical"]
+    assert rule["source"] is not None
+    assert rule["source_url"] is not None
+    assert rule["last_verified"] == "2026-03-15"
+

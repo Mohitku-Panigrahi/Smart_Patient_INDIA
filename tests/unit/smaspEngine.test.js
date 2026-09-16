@@ -50,6 +50,17 @@ describe('SmaspEngine — High-Performance Intelligence Engine', () => {
       expect(res.plainEnglishWhy).toContain('allergy');
     });
 
+    test('should be immune to false-positive allergy triggers from descriptions or warnings', () => {
+      // Paracetamol, Metformin, and Amoxicillin should NOT trigger an NSAID allergy
+      const paraRes = engine.calculatePersonalRisk('para-001', { allergies: ['nsaid', 'aspirin'] });
+      expect(paraRes.level).toBe('safe');
+      expect(paraRes.matchedFactors).not.toContain('Known allergy match (nsaid)');
+
+      const metRes = engine.calculatePersonalRisk('met-001', { allergies: ['nsaid'] });
+      expect(metRes.level).toBe('safe');
+      expect(metRes.matchedFactors).not.toContain('Known allergy match (nsaid)');
+    });
+
     test('should escalate to avoid for pregnant patient taking doxycycline', () => {
       const res = engine.calculatePersonalRisk('dox-001', { isPregnant: true });
       expect(res.level).toBe('avoid');
@@ -75,13 +86,16 @@ describe('SmaspEngine — High-Performance Intelligence Engine', () => {
       expect(res).toEqual([]);
     });
 
-    test('should detect direct clash between Ibuprofen and Lisinopril', () => {
+    test('should detect direct clash between Ibuprofen and Lisinopril with provenance explainability', () => {
       const res = engine.checkInteractions(['ibu-001', 'lis-001']);
       expect(res.length).toBeGreaterThanOrEqual(1);
       const directClash = res.find(r => r.type === 'direct_clash');
       expect(directClash).toBeDefined();
       expect(directClash.level).toBe('avoid');
       expect(directClash.plainEnglishWhy).toContain('Lisinopril');
+      expect(directClash.evidenceLevel).toBe('Established');
+      expect(directClash.source).toContain('FDA');
+      expect(directClash.lastVerified).toBe('2026-03-15');
     });
 
     test('should detect direct clash between Aspirin and Warfarin', () => {

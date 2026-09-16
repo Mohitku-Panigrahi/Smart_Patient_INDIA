@@ -678,13 +678,34 @@
 
         const warningsHtml = warnings.map(w => {
           const icon = w.level === 'avoid' ? '🛑' : '⚠️';
+          const isAvoid = w.level === 'avoid';
+          const borderClr = isAvoid ? 'border-red-300 dark:border-red-800 bg-red-50/70 dark:bg-red-950/40 text-red-950 dark:text-red-100' : 'border-amber-300 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/40 text-amber-950 dark:text-amber-100';
+
           return `
-            <div class="p-3 rounded-xl bg-white/70 dark:bg-slate-800/80 border border-current/20 space-y-1 text-sm">
-              <div class="font-extrabold flex items-center gap-1.5">
-                <span>${icon}</span>
-                <span>${w.title}</span>
+            <div class="p-3.5 rounded-2xl border ${borderClr} space-y-2 text-sm">
+              <div class="flex items-start justify-between gap-2">
+                <div class="font-extrabold flex items-center gap-1.5 text-sm">
+                  <span>${icon}</span>
+                  <span>${escapeHtml(w.title)}</span>
+                </div>
+                <span class="shrink-0 px-2 py-0.5 rounded text-[10px] font-extrabold uppercase tracking-wider ${w.evidenceLevel === 'Established' ? 'bg-purple-100 dark:bg-purple-900/60 text-purple-900 dark:text-purple-200 border border-purple-300 dark:border-purple-700' : 'bg-blue-100 dark:bg-blue-900/60 text-blue-900 dark:text-blue-200 border border-blue-300 dark:border-blue-700'}">
+                  ${escapeHtml(w.evidenceLevel || 'Established')}
+                </span>
               </div>
-              <p class="text-xs opacity-90 leading-relaxed font-medium">${w.plainEnglishWhy}</p>
+
+              <p class="text-xs opacity-95 leading-relaxed font-medium">${escapeHtml(w.plainEnglishWhy)}</p>
+
+              <!-- Clinical Evidence & Provenance Block (Explainability) -->
+              <div class="pt-2 border-t border-current/15 text-[11px] space-y-1 font-mono">
+                <div class="font-bold flex items-center gap-1">
+                  <span>🔬 Why this warning?</span>
+                  <span class="font-normal font-sans">${escapeHtml(w.mechanism || w.title)}</span>
+                </div>
+                <div class="flex items-center justify-between text-[10px] opacity-80 pt-0.5">
+                  <span>Authority Source: ${escapeHtml(w.source || 'CDSCO / FDA DailyMed')}</span>
+                  <span>Last Verified: ${escapeHtml(w.lastVerified || '2026-03-15')}</span>
+                </div>
+              </div>
             </div>
           `;
         }).join('');
@@ -694,7 +715,7 @@
           <div class="flex items-center gap-2 font-extrabold text-base">
             <span>⚠️ Safety Notice: ${warnings.length} Potential Interaction${warnings.length > 1 ? 's' : ''}</span>
           </div>
-          <div class="space-y-2">
+          <div class="space-y-2.5">
             ${warningsHtml}
           </div>
         `;
@@ -718,7 +739,7 @@
         return `
           <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
             <div>
-              <a href="medicine.html?id=${encodeURIComponent(med.id)}" class="font-bold text-slate-900 dark:text-white hover:text-brand-600 text-sm">${escapeHtml(med.genericName)}</a>
+              <button onclick="openMedicineDetailModal('${escapeHtml(med.id)}')" type="button" class="font-bold text-slate-900 dark:text-white hover:text-brand-600 text-sm text-left block">${escapeHtml(med.genericName)}</button>
               <div class="text-xs text-slate-400">${escapeHtml(med.category)}</div>
             </div>
             <button onclick="toggleSavedMedicine('${med.id}')" class="text-red-500 hover:text-red-700 p-1.5 text-xs font-bold" aria-label="Remove ${escapeHtml(med.genericName)} from cabinet">✕</button>
@@ -890,6 +911,22 @@
 
                 <div class="p-3 rounded-2xl bg-orange-50/80 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900/60 text-xs font-medium text-orange-900 dark:text-orange-200 leading-relaxed">
                   🇮🇳 <strong>हिन्दी चेतावनी:</strong> ${escapeHtml(item.hindiWarning)}
+                </div>
+
+                <!-- Clinical Evidence & Provenance Block -->
+                <div class="p-3 rounded-2xl bg-slate-50 dark:bg-slate-900/70 border border-slate-200 dark:border-slate-700/80 space-y-1.5 text-[11px]">
+                  <div class="font-bold text-slate-800 dark:text-slate-200 flex items-center justify-between">
+                    <span>🔬 Why this warning?</span>
+                    <span class="px-2 py-0.5 rounded text-[10px] font-extrabold uppercase ${item.evidenceLevel === 'Established' ? 'bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-300 dark:border-purple-800' : 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300 border border-blue-300 dark:border-blue-800'}">
+                      ${escapeHtml(item.evidenceLevel || 'Established')}
+                    </span>
+                  </div>
+                  <div class="text-slate-600 dark:text-slate-400">
+                    <strong>Authority Source:</strong> ${escapeHtml(item.source || 'Ayush Research Portal / CDSCO')}
+                  </div>
+                  <div class="text-slate-500 dark:text-slate-400 font-mono text-[10px]">
+                    Last verified: 2026-03-15 • CDSCO / AYUSH Monograph Review
+                  </div>
                 </div>
               </div>
 

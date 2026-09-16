@@ -68,7 +68,8 @@ class MedicineService:
     def _resolve_canonical_ids(self, medicine_name: str, cursor: sqlite3.Cursor) -> List[Tuple[str, str]]:
         """
         Resolves a user-provided name (brand or generic) into a list of (canonical_id, display_name) tuples.
-        Decomposes combination salts (e.g. Combiflam -> [ibp-001, ibu-001, para-001]).
+        Decomposes complex combination salts across brands and generics
+        (e.g. Combiflam -> [ibp-001, ibu-001, para-001], Pan-D -> [pan-001, dom-001]).
         """
         clean = medicine_name.strip()
         results: List[Tuple[str, str]] = []
@@ -76,11 +77,12 @@ class MedicineService:
 
         # 1. Match Indian trade brand
         brand_row = cursor.execute("""
-            SELECT canonical_medicine_id, generic_name, brand_name 
+            SELECT canonical_medicine_id, generic_name, composition, brand_name 
             FROM indian_brands 
-            WHERE brand_name LIKE ? OR brand_name LIKE ?
+            WHERE brand_name = ? OR brand_name LIKE ?
+            ORDER BY CASE WHEN brand_name = ? THEN 1 ELSE 2 END, LENGTH(brand_name) ASC
             LIMIT 1
-        """, (f"%{clean}%", f"{clean}%")).fetchone()
+        """, (clean, f"{clean}%", clean)).fetchone()
 
         if brand_row:
             c_id = brand_row["canonical_medicine_id"]
@@ -88,29 +90,85 @@ class MedicineService:
                 seen_ids.add(c_id)
                 results.append((c_id, brand_row["brand_name"]))
 
-            # Also decompose combination salts if generic has "and" or "+"
-            gen = brand_row["generic_name"]
-            for part in gen.replace(" and ", ",").replace("+", ",").split(","):
-                part_clean = part.strip()
+            # Decompose combination salts from generic_name and composition
+            combo_text = f"{brand_row['generic_name']} + {brand_row['composition'] or ''}"
+            parts = combo_text.replace(" and ", ",").replace("+", ",").replace("/", ",").replace("&", ",").split(",")
+            for part in parts:
+                part_clean = ''.join([c for c in part if not c.isdigit()]).replace("mg", "").replace("mcg", "").replace("ml", "").replace("IU", "").strip()
+                if len(part_clean) < 3:
+                    continue
+                p_lower = part_clean.lower()
                 m_row = cursor.execute("""
                     SELECT id, generic_name FROM medicines 
-                    WHERE normalized_name LIKE ? OR generic_name LIKE ?
+                    WHERE normalized_name = ? OR normalized_name LIKE ? OR normalized_name LIKE ?
+                    ORDER BY 
+                       CASE WHEN normalized_name = ? THEN 1 WHEN normalized_name LIKE ? THEN 2 ELSE 3 END,
+                       CASE WHEN generic_name LIKE '% and %' OR generic_name LIKE '%+%' OR generic_name LIKE '%/%' THEN 2 ELSE 1 END,
+                       LENGTH(generic_name) ASC
                     LIMIT 1
-                """, (f"%{part_clean.lower()}%", f"%{part_clean}%")).fetchone()
+                """, (p_lower, f"{p_lower} %", f"{p_lower} (%", p_lower, f"{p_lower} %")).fetchone()
                 if m_row and m_row["id"] not in seen_ids:
                     seen_ids.add(m_row["id"])
                     results.append((m_row["id"], m_row["generic_name"]))
 
-        # 2. Direct master medicine match
-        m_row = cursor.execute("""
-            SELECT id, generic_name FROM medicines 
-            WHERE generic_name LIKE ? OR normalized_name LIKE ?
+        # 2. Direct master medicine match (precision single-entity or exact combo match)
+        clean_lower = clean.lower()
+        m_rows = cursor.execute("""
+            SELECT id, generic_name, normalized_name FROM medicines 
+            WHERE normalized_name = ? 
+               OR normalized_name LIKE ? 
+               OR normalized_name LIKE ?
+            ORDER BY 
+               CASE 
+                 WHEN normalized_name = ? THEN 1
+                 WHEN normalized_name LIKE ? THEN 2
+                 ELSE 3
+               END,
+               -- Penalize multi-ingredient combination drugs when querying a single salt (e.g. Paracetamol != Ibuprofen and Paracetamol)
+               CASE 
+                 WHEN generic_name LIKE '% and %' OR generic_name LIKE '%+%' OR generic_name LIKE '%/%' THEN 2 
+                 ELSE 1 
+               END,
+               LENGTH(generic_name) ASC
             LIMIT 1
-        """, (f"%{clean}%", f"%{clean.lower()}%")).fetchone()
+        """, (
+            clean_lower, 
+            f"{clean_lower} %", 
+            f"{clean_lower} (%", 
+            clean_lower, 
+            f"{clean_lower} %"
+        )).fetchall()
 
-        if m_row and m_row["id"] not in seen_ids:
-            seen_ids.add(m_row["id"])
-            results.append((m_row["id"], m_row["generic_name"]))
+        # Fallback if no exact prefix match
+        if not m_rows:
+            m_rows = cursor.execute("""
+                SELECT id, generic_name, normalized_name FROM medicines 
+                WHERE normalized_name LIKE ? OR generic_name LIKE ?
+                ORDER BY LENGTH(generic_name) ASC
+                LIMIT 1
+            """, (f"%{clean_lower}%", f"%{clean}%")).fetchall()
+
+        for m_row in m_rows:
+            if m_row["id"] not in seen_ids:
+                seen_ids.add(m_row["id"])
+                results.append((m_row["id"], m_row["generic_name"]))
+
+            # Decompose if generic name itself is an explicit combination (e.g. Amoxicillin/Clavulanate)
+            gen_name = m_row["generic_name"]
+            if "/" in gen_name or " and " in gen_name or "+" in gen_name:
+                subparts = gen_name.replace(" and ", ",").replace("+", ",").replace("/", ",").split(",")
+                for sub in subparts:
+                    sub_clean = sub.strip()
+                    if len(sub_clean) >= 3:
+                        s_lower = sub_clean.lower()
+                        sub_row = cursor.execute("""
+                            SELECT id, generic_name FROM medicines 
+                            WHERE (normalized_name = ? OR normalized_name LIKE ? OR normalized_name LIKE ?) AND id != ?
+                            LIMIT 1
+                        """, (s_lower, f"{s_lower} %", f"{s_lower} (%", m_row["id"])).fetchone()
+                        if sub_row and sub_row["id"] not in seen_ids:
+                            seen_ids.add(sub_row["id"])
+                            results.append((sub_row["id"], sub_row["generic_name"]))
 
         return results
 
