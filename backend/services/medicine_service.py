@@ -549,3 +549,150 @@ class MedicineService:
         brands = [dict(r) for r in rows]
         conn.close()
         return brands
+
+    def evaluate_bio_cascades(self, medicines: List[str], herbs: Optional[List[str]] = None, patient_profile: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
+        """
+        Executes multi-order physiological bio-cascade analysis:
+        1. The Triple Whammy (Glomerular Hemodynamic Collapse)
+        2. Hepatic CYP450 Enzymatic Competition & Clearance Matrix
+        3. Cumulative Anticholinergic Cognitive Burden (ACB) Scale
+        4. Composite QTc Interval Arrhythmia Vector Sum
+        5. Cumulative Hemorrhagic Bleeding Risk Index
+        6. Ayurvedic Bio-Enhancer Pharmacokinetic Surge (The Piperine Effect)
+        """
+        herbs = herbs or []
+        patient_profile = patient_profile or {}
+        med_str = " ".join([m.lower() for m in medicines])
+        herb_str = " ".join([h.lower() for h in herbs])
+        age = int(patient_profile.get("age", 35))
+
+        # 1. Triple Whammy Detection
+        has_nsaid = any(k in med_str for k in ["ibuprofen", "combiflam", "diclofenac", "naproxen", "aspirin"])
+        has_raas = any(k in med_str for k in ["telmisartan", "telma", "lisinopril", "ramipril", "losartan", "enalapril"])
+        has_diuretic = any(k in med_str for k in ["furosemide", "lasix", "hydrochlorothiazide", "chlorthalidone", "spironolactone"])
+
+        triple_whammy = None
+        if has_nsaid and has_raas and has_diuretic:
+            triple_whammy = {
+                "id": "cascade-triple-whammy-triad",
+                "severity": "CRITICAL",
+                "title": "The Triple Whammy: Glomerular Hemodynamic Collapse",
+                "mechanism": "Three-point collapse of renal autoregulation: (1) NSAID constricts afferent arteriole, (2) ACEi/ARB dilates efferent arteriole, (3) Diuretic induces volume depletion. Glomerular filtration pressure collapses.",
+                "clinical_risk": "Catastrophic Acute Kidney Injury (AKI), acute tubular necrosis, and severe hyperkalemia.",
+                "actionable_guidance": "Avoid combination. Replace NSAID with Paracetamol for analgesia in patients on ACEi/ARB + Diuretic.",
+                "evidence_level": "Established",
+                "source": "NICE Guidelines / British Journal of Clinical Pharmacology / CDSCO"
+            }
+        elif has_nsaid and has_raas:
+            triple_whammy = {
+                "id": "cascade-triple-whammy-dyad",
+                "severity": "AVOID",
+                "title": "NSAID + Renin-Angiotensin Blockade: Renal Hemodynamic Strain",
+                "mechanism": "NSAID inhibits vasodilatory renal prostaglandins while ARB/ACEi blocks efferent constriction.",
+                "clinical_risk": "Acute elevation in serum creatinine, fluid retention, and hyperkalemia.",
+                "actionable_guidance": "Avoid routine co-prescribing. Substitute with Paracetamol.",
+                "evidence_level": "Established",
+                "source": "FDA DailyMed / KDIGO Guidelines"
+            }
+
+        # 2. CYP450 Enzymatic Competition
+        cyp_bottlenecks = []
+        # CYP3A4
+        if any(k in med_str for k in ["clarithromycin", "fluconazole", "ketoconazole"]) and any(k in med_str for k in ["atorvastatin", "atorva", "simvastatin"]):
+            cyp_bottlenecks.append({
+                "enzyme": "CYP3A4",
+                "severity": "AVOID",
+                "title": "Metabolic Clearance Blockade: CYP3A4 Inhibition Driven Statin Surge",
+                "mechanism": "Macrolide/Azole strongly inhibits CYP3A4, collapsing hepatic first-pass degradation of statin.",
+                "projected_exposure_multiplier": "4x to 8x AUC surge",
+                "clinical_risk": "Severe rhabdomyolysis, myoglobinuria, and acute renal tubular necrosis.",
+                "actionable_guidance": "Temporarily suspend Atorvastatin during Clarithromycin therapy.",
+                "evidence_level": "Established",
+                "source": "FDA DailyMed / Flockhart Table"
+            })
+
+        # 3. Anticholinergic Burden (ACB)
+        acb_weights = {
+            "amitriptyline": 3, "hydroxyzine": 3, "chlorpheniramine": 3, "diphenhydramine": 3,
+            "cetirizine": 1, "levocetirizine": 1, "montair-lc": 1, "domperidone": 1, "pan-d": 1,
+            "ranitidine": 1, "alprazolam": 1, "atenolol": 1
+        }
+        total_acb = sum(w for drug, w in acb_weights.items() if drug in med_str)
+        is_geriatric = age >= 65
+        acb_burden = {
+            "total_score": total_acb,
+            "risk_level": "HIGH" if (total_acb >= 3 or (is_geriatric and total_acb >= 2)) else "MODERATE" if total_acb >= 1 else "LOW",
+            "is_geriatric": is_geriatric,
+            "title": "High Geriatric Cognitive Impairment Risk" if (is_geriatric and total_acb >= 2) else "Anticholinergic Burden Score",
+            "clinical_risk": "Cumulative muscarinic receptor blockade predisposing older adults to acute delirium, confusion, falls, and urinary retention." if (total_acb >= 2 and is_geriatric) else "Mild peripheral anticholinergic exposure.",
+            "evidence_level": "Established",
+            "source": "ACB Scale (Boustani et al.) / Beers Criteria 2023"
+        }
+
+        # 4. Composite QTc Vector Sum
+        qtc_weights = {
+            "domperidone": 3.0, "pan-d": 3.0, "azithromycin": 2.5, "azithral": 2.5,
+            "clarithromycin": 2.5, "ciprofloxacin": 2.0, "ondansetron": 2.0, "escitalopram": 2.0
+        }
+        qtc_score = sum(w for drug, w in qtc_weights.items() if drug in med_str)
+        qtc_risk = {
+            "composite_score": qtc_score,
+            "severity": "AVOID" if qtc_score >= 5.0 else "CAUTION" if qtc_score >= 3.0 else "SAFE",
+            "title": "Additive QTc Interval Prolongation & Arrhythmia Hazard" if qtc_score >= 3.0 else "Normal Repolarization Profile",
+            "mechanism": "Cumulative blockade of cardiac hERG potassium channels (I_Kr) delaying myocardial repolarization.",
+            "clinical_risk": "Synergistic prolongation exceeding 500ms, predisposing to Torsades de Pointes and ventricular fibrillation.",
+            "evidence_level": "Established",
+            "source": "CredibleMeds QTDrugs List / CDSCO Safety Notice"
+        }
+
+        # 5. Cumulative Hemorrhagic Bleeding Risk
+        bleed_score = 0
+        if any(k in med_str for k in ["warfarin", "dabigatran"]): bleed_score += 3
+        if any(k in med_str for k in ["aspirin", "ecosprin", "clopidogrel"]): bleed_score += 2
+        if any(k in med_str for k in ["ibuprofen", "combiflam", "diclofenac"]): bleed_score += 2
+        if any(k in med_str for k in ["sertraline", "fluoxetine"]): bleed_score += 1
+        if any(k in herb_str for k in ["guggulu", "curcumin", "haldi"]): bleed_score += 1
+        if "ulcer" in str(patient_profile.get("conditions", [])).lower(): bleed_score += 2
+
+        bleed_risk = {
+            "bleed_score": bleed_score,
+            "level": "CRITICAL" if bleed_score >= 5 else "HIGH" if bleed_score >= 3 else "MODERATE" if bleed_score >= 2 else "LOW",
+            "title": "Compounded Gastrointestinal & Systemic Hemorrhage Hazard" if bleed_score >= 3 else "Baseline Hemostasis",
+            "clinical_risk": "Multi-pathway hemostatic impairment: Factor synthesis inhibition + platelet COX-1 blockade + mucosal injury.",
+            "evidence_level": "Established",
+            "source": "HAS-BLED Adapted Criteria / FDA DailyMed"
+        }
+
+        # 6. Ayurvedic Bio-Enhancer Surge
+        bio_enhancers = []
+        if any(k in herb_str for k in ["trikatu", "maricha", "pippali", "pepper"]):
+            if any(k in med_str for k in ["metformin", "glycomet"]):
+                bio_enhancers.append({
+                    "title": "Bio-Enhancer Surge: Piperine + Metformin",
+                    "severity": "AVOID",
+                    "mechanism": "Piperine inhibits intestinal P-glycoprotein efflux and hepatic CYP3A4, doubling systemic absorption.",
+                    "clinical_risk": "Acute precipitous drop in blood glucose / hypoglycemic shock.",
+                    "actionable_guidance": "Separate administration by at least 4 hours.",
+                    "evidence_level": "Established",
+                    "source": "Ayurvedic Pharmacopoeia of India / Clinical Pharmacokinetics"
+                })
+
+        has_critical = (
+            (triple_whammy and triple_whammy["severity"] in ["CRITICAL", "AVOID"]) or
+            len(cyp_bottlenecks) > 0 or
+            acb_burden["risk_level"] == "HIGH" or
+            qtc_risk["severity"] == "AVOID" or
+            bleed_risk["level"] in ["CRITICAL", "HIGH"] or
+            len(bio_enhancers) > 0
+        )
+
+        return {
+            "has_critical_alerts": has_critical,
+            "triple_whammy": triple_whammy,
+            "cyp_bottlenecks": cyp_bottlenecks,
+            "acb_burden": acb_burden,
+            "qtc_risk": qtc_risk,
+            "bleed_risk": bleed_risk,
+            "bio_enhancers": bio_enhancers
+        }
+

@@ -553,6 +553,7 @@
 
   <!-- Intelligence Engine & Dataset Wire Scripts -->
   <script src="js/engine/smaspEngine.js"></script>
+  <script src="js/engine/bioCascadeEngine.js"></script>
   <script src="js/data/indianPharma.js"></script>
   <script src="js/data/ayurvedaAllopathy.js"></script>
   <script src="js/engine/adrPredictor.js"></script>
@@ -564,6 +565,7 @@
     // ── Global State ───────────────────────────────────────────────────────────
     let medicinesData = [];
     let engine = null;
+    let bioEngine = null;
     let currentCategory = 'all';
     let searchQuery = '';
 
@@ -664,19 +666,84 @@
 
       const warnings = engine.checkInteractions(savedIds);
 
-      if (warnings.length === 0) {
+      // Evaluate Multi-Order Physiological Bio-Cascades (Triple Whammy, CYP, ACB, QTc)
+      const cascadeAlerts = [];
+      if (bioEngine) {
+        const savedDrugObjects = savedIds.map(id => engine ? engine.drugMap.get(id) : null).filter(Boolean);
+        const drugNames = savedDrugObjects.map(d => d.genericName);
+        const userProfile = getUserProfile();
+        const cascades = bioEngine.evaluateFullBioCascade(drugNames, [], userProfile);
+
+        if (cascades.tripleWhammy) {
+          cascadeAlerts.push({
+            level: 'avoid',
+            title: cascades.tripleWhammy.title,
+            plainEnglishWhy: `${cascades.tripleWhammy.mechanism} ${cascades.tripleWhammy.actionableGuidance}`,
+            mechanism: cascades.tripleWhammy.mechanism,
+            evidenceLevel: cascades.tripleWhammy.evidenceLevel,
+            source: cascades.tripleWhammy.source,
+            lastVerified: cascades.tripleWhammy.lastVerified
+          });
+        }
+
+        (cascades.cypBottlenecks || []).forEach(cyp => {
+          cascadeAlerts.push({
+            level: 'avoid',
+            title: cyp.title,
+            plainEnglishWhy: `${cyp.mechanism} Projected Exposure Multiplier: ${cyp.projectedExposureMultiplier}. ${cyp.actionableGuidance}`,
+            mechanism: cyp.mechanism,
+            evidenceLevel: cyp.evidenceLevel,
+            source: cyp.source,
+            lastVerified: cyp.lastVerified
+          });
+        });
+
+        if (cascades.acbBurden && cascades.acbBurden.riskLevel === 'HIGH') {
+          cascadeAlerts.push({
+            level: 'caution',
+            title: cascades.acbBurden.title,
+            plainEnglishWhy: `${cascades.acbBurden.clinicalImplications} ${cascades.acbBurden.actionableGuidance}`,
+            mechanism: `Cumulative Anticholinergic Cognitive Burden Score: ${cascades.acbBurden.totalScore}`,
+            evidenceLevel: cascades.acbBurden.evidenceLevel,
+            source: cascades.acbBurden.source,
+            lastVerified: cascades.acbBurden.lastVerified
+          });
+        }
+
+        if (cascades.qtcRisk && cascades.qtcRisk.severity === 'AVOID') {
+          cascadeAlerts.push({
+            level: 'avoid',
+            title: cascades.qtcRisk.title,
+            plainEnglishWhy: `${cascades.qtcRisk.clinicalRisk} ${cascades.qtcRisk.actionableGuidance}`,
+            mechanism: `${cascades.qtcRisk.mechanism} (Composite Arrhythmia Vector: ${cascades.qtcRisk.compositeScore.toFixed(1)})`,
+            evidenceLevel: cascades.qtcRisk.evidenceLevel,
+            source: cascades.qtcRisk.source,
+            lastVerified: cascades.qtcRisk.lastVerified
+          });
+        }
+      }
+
+      // Combine and deduplicate
+      const seenTitles = new Set();
+      const combinedWarnings = [...cascadeAlerts, ...warnings].filter(w => {
+        if (seenTitles.has(w.title)) return false;
+        seenTitles.add(w.title);
+        return true;
+      });
+
+      if (combinedWarnings.length === 0) {
         container.className = 'p-4 rounded-2xl bg-calm-safeBg border border-calm-safeBorder text-calm-safeText space-y-2';
         container.innerHTML = `
           <div class="flex items-center gap-2 font-bold text-base">
-            <span>✅ No Known Interactions Found</span>
+            <span>✅ No Known Interactions or Cascades Found</span>
           </div>
-          <p class="text-sm">The ${savedIds.length} medicines in your cabinet have no direct clashes or high compounding side effects in our database.</p>
+          <p class="text-sm">The ${savedIds.length} medicines in your cabinet show no direct clashes, compounding side effects, or physiological cascades in our database.</p>
         `;
       } else {
-        const hasAvoid = warnings.some(w => w.level === 'avoid');
+        const hasAvoid = combinedWarnings.some(w => w.level === 'avoid');
         const boxBg = hasAvoid ? 'bg-calm-avoidBg border-calm-avoidBorder text-calm-avoidText' : 'bg-calm-cautionBg border-calm-cautionBorder text-calm-cautionText';
 
-        const warningsHtml = warnings.map(w => {
+        const warningsHtml = combinedWarnings.map(w => {
           const icon = w.level === 'avoid' ? '🛑' : '⚠️';
           const isAvoid = w.level === 'avoid';
           const borderClr = isAvoid ? 'border-red-300 dark:border-red-800 bg-red-50/70 dark:bg-red-950/40 text-red-950 dark:text-red-100' : 'border-amber-300 dark:border-amber-800 bg-amber-50/70 dark:bg-amber-950/40 text-amber-950 dark:text-amber-100';
@@ -1479,9 +1546,12 @@
         console.error('Failed to load medicines.json:', err);
       }
 
-      // Initialize SmaspEngine
+      // Initialize SmaspEngine & BioCascadeEngine
       if (typeof SmaspEngine !== 'undefined') {
         engine = new SmaspEngine(medicinesData);
+      }
+      if (typeof BioCascadeEngine !== 'undefined') {
+        bioEngine = new BioCascadeEngine();
       }
 
       // Bind search input with 100ms debounce

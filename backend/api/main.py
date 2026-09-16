@@ -40,6 +40,12 @@ class AllergyCheckRequest(BaseModel):
     allergies: List[str] = Field(..., min_length=1, json_schema_extra={"example": ["Penicillin", "NSAIDs"]})
     medicines: List[str] = Field(..., min_length=1, json_schema_extra={"example": ["Augmentin 625 Duo", "Combiflam"]})
 
+class CascadeEvaluationRequest(BaseModel):
+    medicines: List[str] = Field(..., min_length=1, json_schema_extra={"example": ["Combiflam", "Telma 40", "Lasix"]})
+    herbs: Optional[List[str]] = Field(default_factory=list, json_schema_extra={"example": ["Trikatu"]})
+    age: Optional[int] = Field(35, ge=1, le=110)
+    conditions: Optional[List[str]] = Field(default_factory=list, json_schema_extra={"example": ["hypertension"]})
+
 class ADRPredictionRequest(BaseModel):
     age: int = Field(65, ge=1, le=110, json_schema_extra={"example": 68})
     gender: str = Field("male", json_schema_extra={"example": "male"})
@@ -55,7 +61,7 @@ class ADRPredictionRequest(BaseModel):
 def root():
     return {
         "name": "Smart Patient India API",
-        "version": "3.0.0",
+        "version": "4.0.0",
         "status": "operational",
         "docs": "/docs",
         "endpoints": [
@@ -63,6 +69,7 @@ def root():
             "GET  /api/medicine/{query}",
             "POST /api/check-interaction",
             "POST /api/check-allergy",
+            "POST /api/evaluate-cascades",
             "POST /api/predict-adr",
             "GET  /api/indian-brands"
         ]
@@ -140,6 +147,22 @@ def check_allergy(req: AllergyCheckRequest):
         "allergy_clash_detected": len(alerts) > 0,
         "allergy_clashes_count": len(alerts),
         "alerts": alerts
+    }
+
+@app.post("/api/evaluate-cascades")
+def evaluate_cascades_endpoint(req: CascadeEvaluationRequest):
+    """
+    Executes multi-order physiological bio-cascade evaluation:
+    Glomerular collapse (The Triple Whammy), CYP450 competition, Anticholinergic cognitive burden,
+    composite QTc vector sum, cumulative hemorrhagic risk, and Ayurvedic bio-enhancer surges.
+    """
+    profile = {"age": req.age, "conditions": req.conditions}
+    cascades = service.evaluate_bio_cascades(req.medicines, req.herbs, profile)
+    return {
+        "status": "success",
+        "medicines_evaluated": req.medicines,
+        "herbs_evaluated": req.herbs,
+        "bio_cascades": cascades
     }
 
 @app.post("/api/predict-adr")

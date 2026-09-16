@@ -241,3 +241,43 @@ def test_provenance_and_explainability_contract():
     assert rule["source_url"] is not None
     assert rule["last_verified"] == "2026-03-15"
 
+def test_backend_bio_cascades_service_evaluation():
+    service = MedicineService()
+    # 1. Triple Whammy Triad
+    regimen = ["Combiflam", "Telma 40", "Lasix", "Clarithromycin", "Atorva"]
+    herbs = ["Trikatu Churna"]
+    profile = {"age": 72, "conditions": ["hypertension", "peptic ulcer"]}
+
+    cascades = service.evaluate_bio_cascades(regimen, herbs, profile)
+    assert cascades["has_critical_alerts"] is True
+    assert cascades["triple_whammy"] is not None
+    assert cascades["triple_whammy"]["severity"] == "CRITICAL"
+    assert "Three-point collapse" in cascades["triple_whammy"]["mechanism"]
+
+    # 2. CYP3A4 bottleneck
+    assert len(cascades["cyp_bottlenecks"]) >= 1
+    assert cascades["cyp_bottlenecks"][0]["enzyme"] == "CYP3A4"
+
+    # 3. Geriatric ACB burden
+    assert cascades["acb_burden"]["is_geriatric"] is True
+
+    # 4. Ayurvedic bio-enhancer surge
+    bio_enhancers = service.evaluate_bio_cascades(["Metformin"], ["Trikatu"])
+    assert len(bio_enhancers["bio_enhancers"]) >= 1
+    assert "Piperine" in bio_enhancers["bio_enhancers"][0]["title"]
+
+def test_api_evaluate_cascades_endpoint():
+    payload = {
+        "medicines": ["Combiflam", "Telma 40", "Lasix"],
+        "herbs": ["Trikatu"],
+        "age": 68,
+        "conditions": ["hypertension"]
+    }
+    res = client.post("/api/evaluate-cascades", json=payload)
+    assert res.status_code == 200
+    data = res.json()
+    assert data["status"] == "success"
+    cascades = data["bio_cascades"]
+    assert cascades["triple_whammy"]["severity"] == "CRITICAL"
+
+

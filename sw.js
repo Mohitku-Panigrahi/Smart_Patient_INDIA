@@ -4,7 +4,7 @@
  * Caches HTML, CSS, JS, and data/medicines.json for 100% offline availability.
  */
 
-const CACHE_NAME = 'smasp-india-v3';
+const CACHE_NAME = 'smasp-india-v4';
 
 const CORE_ASSETS = [
   './',
@@ -13,6 +13,7 @@ const CORE_ASSETS = [
   './data/medicines.json',
   './data/adr_model_weights.json',
   './js/engine/smaspEngine.js',
+  './js/engine/bioCascadeEngine.js',
   './js/engine/adrPredictor.js',
   './js/engine/riskEngine.js',
   './js/engine/logger.js',
