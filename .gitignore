@@ -18,3 +18,14 @@ npm-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# Python cache & tests
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+.venv/
+env/
+venv/
