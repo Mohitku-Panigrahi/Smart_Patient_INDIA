@@ -134,3 +134,4 @@ python -m http.server 3000
 
 *Smart Patient India is an educational health literacy and pharmacological awareness tool. It does not provide medical diagnosis, treatment recommendations, or prescriptions. Always consult a registered medical practitioner before altering any drug regimen.*
 # Smart_Patient_INDIA
+# Smart_Patient_INDIA
