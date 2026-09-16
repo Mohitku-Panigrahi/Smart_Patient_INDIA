@@ -92,6 +92,138 @@
       activeConstituents: "Curcuminoids, turmerone",
       primaryOrganImpact: "Platelet function, Hepatic metabolism (CYP3A4)",
       hindiName: "हल्दी अर्क"
+    },
+    {
+      id: "ayur-trikatu",
+      commonName: "Trikatu (Piperine Complex)",
+      sanskritName: "Piper nigrum + Piper longum + Zingiber officinale",
+      traditionalUse: "Bio-enhancer (Yogavahi), digestive stimulant (Deepana/Pachana)",
+      activeConstituents: "Piperine, 6-gingerol, piperlongumine",
+      primaryOrganImpact: "Intestinal P-gp efflux pump, Hepatic CYP3A4 & CYP2C9",
+      hindiName: "त्रिकटु"
+    }
+  ];
+
+  /**
+   * Classical Ayurvedic Polyherbal Formulations with Full Botanical & Phytochemical Decomposition.
+   * Enables ingredient-level pharmacology and interaction mapping for classical multi-herb recipes.
+   */
+  const CLASSICAL_POLYHERBAL_CATALOG = [
+    {
+      id: "poly-triphala",
+      name: "Triphala",
+      classicalText: "Charaka Samhita / Ashtanga Hridaya",
+      botanicalConstituents: [
+        { commonName: "Haritaki", scientificName: "Terminalia chebula", part: "Fruit rind", phytochemicals: ["Chebulinic acid", "Tannins", "Gallic acid"] },
+        { commonName: "Bibhitaki", scientificName: "Terminalia bellirica", part: "Fruit rind", phytochemicals: ["Gallic acid", "Ellagic acid", "Tannins"] },
+        { commonName: "Amalaki", scientificName: "Emblica officinalis", part: "Pericarp", phytochemicals: ["Ascorbic acid", "Emblicanin", "Polyphenols"] }
+      ],
+      activeDrivers: ["Tannins", "Gallic acid"],
+      mappedSingleHerbs: ["Triphala", "Amalaki", "Haritaki"],
+      pharmacologicalInteractions: ["Iron chelation (reduces oral ferrous sulfate/ascorbate absorption by >60%)", "Mild peristalsis acceleration"],
+      hindiName: "त्रिफला चूर्ण / वटी"
+    },
+    {
+      id: "poly-trikatu",
+      name: "Trikatu",
+      classicalText: "Bhavaprakasha / Charaka Samhita",
+      botanicalConstituents: [
+        { commonName: "Maricha (Black Pepper)", scientificName: "Piper nigrum", part: "Fruit", phytochemicals: ["Piperine", "Chavicine"] },
+        { commonName: "Pippali (Long Pepper)", scientificName: "Piper longum", part: "Fruit spike", phytochemicals: ["Piperine", "Piperlongumine"] },
+        { commonName: "Shunthi (Dry Ginger)", scientificName: "Zingiber officinale", part: "Rhizome", phytochemicals: ["6-Gingerol", "6-Shogaol"] }
+      ],
+      activeDrivers: ["Piperine", "Gingerols"],
+      mappedSingleHerbs: ["Trikatu", "Piperine", "Pippali", "Maricha"],
+      pharmacologicalInteractions: ["Potent P-glycoprotein efflux pump inhibition", "Hepatic CYP3A4 & CYP2C9 metabolic suppression (2x-3x surge in Metformin, Phenytoin, Rifampicin AUC)"],
+      hindiName: "त्रिकटु चूर्ण"
+    },
+    {
+      id: "poly-dashamoola",
+      name: "Dashamoola",
+      classicalText: "Sushruta Samhita / Sharangadhara",
+      botanicalConstituents: [
+        { commonName: "Bilva", scientificName: "Aegle marmelos", part: "Root bark", phytochemicals: ["Marmelosin"] },
+        { commonName: "Agnimantha", scientificName: "Premna integrifolia", part: "Root bark", phytochemicals: ["Premnine"] },
+        { commonName: "Shyonaka", scientificName: "Oroxylum indicum", part: "Root bark", phytochemicals: ["Baicalein"] },
+        { commonName: "Patala", scientificName: "Stereospermum suaveolens", part: "Root bark", phytochemicals: ["Lapachol"] },
+        { commonName: "Gambhari", scientificName: "Gmelina arborea", part: "Root bark", phytochemicals: ["Luteolin"] },
+        { commonName: "Brihati", scientificName: "Solanum indicum", part: "Whole plant", phytochemicals: ["Solanine"] },
+        { commonName: "Kantakari", scientificName: "Solanum surattense", part: "Whole plant", phytochemicals: ["Solasodine"] },
+        { commonName: "Gokshura", scientificName: "Tribulus terrestris", part: "Fruit/Root", phytochemicals: ["Protodioscin", "Saponins"] },
+        { commonName: "Shalaparni", scientificName: "Desmodium gangeticum", part: "Root", phytochemicals: ["Gangetin"] },
+        { commonName: "Prishniparni", scientificName: "Uraria picta", part: "Root", phytochemicals: ["Flavonoids"] }
+      ],
+      activeDrivers: ["Gokshura Saponins", "Flavonoids"],
+      mappedSingleHerbs: ["Dashamoola", "Gokshura"],
+      pharmacologicalInteractions: ["Diuretic synergy (potentiates loop/thiazide diuretics)", "Mild potassium excretion modulation"],
+      hindiName: "दशमूल क्वाथ / अरिष्ट"
+    },
+    {
+      id: "poly-chyawanprash",
+      name: "Chyawanprash",
+      classicalText: "Charaka Samhita Chikitsa Sthana",
+      botanicalConstituents: [
+        { commonName: "Amalaki (Amla base)", scientificName: "Emblica officinalis", part: "Fresh fruit pulp (>60%)", phytochemicals: ["Vitamin C", "Tannoids"] },
+        { commonName: "Pippali", scientificName: "Piper longum", part: "Fruit", phytochemicals: ["Piperine"] },
+        { commonName: "Guduchi (Giloy)", scientificName: "Tinospora cordifolia", part: "Stem", phytochemicals: ["Tinosporide", "Berberine"] },
+        { commonName: "Ashwagandha", scientificName: "Withania somnifera", part: "Root", phytochemicals: ["Withanolides"] },
+        { commonName: "Dashamoola Complex", scientificName: "Ten Roots", part: "Decoction", phytochemicals: ["Flavonoid glycosides"] },
+        { commonName: "Elaichi (Cardamom)", scientificName: "Elettaria cardamomum", part: "Seed", phytochemicals: ["1,8-Cineole"] }
+      ],
+      activeDrivers: ["Piperine", "Guduchi", "Ashwagandha", "Sugar/Honey Base"],
+      mappedSingleHerbs: ["Chyawanprash", "Amalaki", "Giloy / Guduchi", "Ashwagandha", "Pippali", "Trikatu"],
+      pharmacologicalInteractions: ["Piperine-mediated pharmacokinetic bio-enhancement", "High jaggery/sugar matrix in diabetic regimens", "Immunostimulatory offset of immunosuppressants"],
+      hindiName: "च्यवनप्राश अवलेह"
+    },
+    {
+      id: "poly-chandraprabha",
+      name: "Chandraprabha Vati",
+      classicalText: "Sharangadhara Samhita",
+      botanicalConstituents: [
+        { commonName: "Guggulu (Purified)", scientificName: "Commiphora mukul", part: "Exudate", phytochemicals: ["Guggulsterones E & Z"] },
+        { commonName: "Shilajit (Purified)", scientificName: "Asphaltum punjabianum", part: "Exudate", phytochemicals: ["Fulvic acid", "Humic acid"] },
+        { commonName: "Haridra (Curcumin)", scientificName: "Curcuma longa", part: "Rhizome", phytochemicals: ["Curcuminoids"] },
+        { commonName: "Daruharidra", scientificName: "Berberis aristata", part: "Stem", phytochemicals: ["Berberine"] },
+        { commonName: "Trikatu (Piperine + Ginger)", scientificName: "Piper nigrum + P. longum + Zingiber", part: "Fruit/Rhizome", phytochemicals: ["Piperine", "Gingerols"] },
+        { commonName: "Trivrit", scientificName: "Operculina turpethum", part: "Root", phytochemicals: ["Turpethin"] },
+        { commonName: "Loha Bhasma", scientificName: "Incinerated Iron", part: "Calcined ash", phytochemicals: ["Micro-particulate Fe3O4"] }
+      ],
+      activeDrivers: ["Guggulsterones", "Piperine", "Fulvic Acid", "Curcuminoids"],
+      mappedSingleHerbs: ["Chandraprabha Vati", "Guggulu", "Haldi / Curcumin", "Trikatu"],
+      pharmacologicalInteractions: ["Synergistic antiplatelet bleeding with Ecosprin/Warfarin", "CYP3A4/P-gp bio-enhancement", "Additive hypoglycemia with oral antidiabetics"],
+      hindiName: "चन्द्रप्रभा वटी"
+    },
+    {
+      id: "poly-kanchnar",
+      name: "Kanchnar Guggulu",
+      classicalText: "Bhavaprakasha",
+      botanicalConstituents: [
+        { commonName: "Kanchnar Bark", scientificName: "Bauhinia variegata", part: "Stem bark", phytochemicals: ["Flavonoids", "Tannins"] },
+        { commonName: "Guggulu", scientificName: "Commiphora mukul", part: "Purified gum", phytochemicals: ["Guggulsterones"] },
+        { commonName: "Triphala", scientificName: "Three Myrobalans", part: "Fruits", phytochemicals: ["Gallic acid"] },
+        { commonName: "Trikatu", scientificName: "Three Pungents", part: "Fruits/Rhizome", phytochemicals: ["Piperine"] },
+        { commonName: "Varuna", scientificName: "Crataeva nurvala", part: "Stem bark", phytochemicals: ["Lupeol"] }
+      ],
+      activeDrivers: ["Guggulsterones", "Piperine", "Lupeol"],
+      mappedSingleHerbs: ["Kanchnar Guggulu", "Guggulu", "Triphala", "Trikatu"],
+      pharmacologicalInteractions: ["Antiplatelet and anticoagulant bleeding augmentation", "Thyroid hormone interaction", "CYP3A4 modulation"],
+      hindiName: "कांचनार गुग्गुलु"
+    },
+    {
+      id: "poly-arogyavardhini",
+      name: "Arogyavardhini Vati",
+      classicalText: "Rasaratnasamucchaya",
+      botanicalConstituents: [
+        { commonName: "Kutki", scientificName: "Picrorhiza kurroa", part: "Rhizome", phytochemicals: ["Picroside I & II", "Kutkoside"] },
+        { commonName: "Triphala", scientificName: "Terminalia chebula, bellirica, Emblica", part: "Fruits", phytochemicals: ["Tannins"] },
+        { commonName: "Shilajit", scientificName: "Purified asphaltum", part: "Mineral resin", phytochemicals: ["Fulvic acid"] },
+        { commonName: "Guggulu", scientificName: "Commiphora mukul", part: "Purified resin", phytochemicals: ["Guggulsterones"] },
+        { commonName: "Chitrak", scientificName: "Plumbago zeylanica", part: "Root", phytochemicals: ["Plumbagin"] }
+      ],
+      activeDrivers: ["Picrosides", "Guggulsterones", "Plumbagin"],
+      mappedSingleHerbs: ["Arogyavardhini Vati", "Guggulu", "Triphala"],
+      pharmacologicalInteractions: ["Hepatic cytochrome modulation", "Additive antidiabetic and lipid-lowering synergy", "Bleeding hazard with antiplatelets"],
+      hindiName: "आरोग्यवर्धिनी वटी"
     }
   ];
 
@@ -266,11 +398,84 @@
       hindiWarning: "दर्द निवारक दवाओं और खून पतला करने वाली गोलियों के साथ अत्यधिक हल्दी सप्लीमेंट्स लेने से पेट में जलन व ब्लीडिंग का जोखिम हो सकता है।",
       evidenceLevel: "Theoretical / In Vitro",
       source: "NIH NCCIH"
+    },
+    {
+      id: "aahi-013",
+      herb: "Trikatu",
+      allopathyGroup: "Oral Antidiabetics / Metformin",
+      allopathyExamples: ["Metformin", "Glycomet", "Glimepiride"],
+      severity: "AVOID",
+      title: "Piperine Bio-Enhancer Surge: Precipitous Hypoglycemic Shock",
+      mechanism: "Piperine in Trikatu suppresses intestinal P-glycoprotein efflux transporters and hepatic CYP3A4, doubling systemic absorption and AUC of Metformin.",
+      clinicalRisk: "Rapid unexpected drop in capillary glucose, diaphoresis, neuroglycopenia, and acute hypoglycemic collapse.",
+      recommendation: "Avoid concurrent ingestion of standardized Trikatu capsules with antidiabetics. Separate by at least 4 hours if advised by an Ayurvedic physician.",
+      hindiWarning: "त्रिकटु (काली मिर्च, सोंठ, पिप्पली) मेटफॉर्मिन के अवशोषण को 2 गुना बढ़ा देता है, जिससे शुगर खतरनाक रूप से गिर सकती है।",
+      evidenceLevel: "Established",
+      source: "Clinical Pharmacokinetics / Ayurvedic Pharmacopoeia of India"
+    },
+    {
+      id: "aahi-014",
+      herb: "Trikatu",
+      allopathyGroup: "Antiepileptics / Phenytoin",
+      allopathyExamples: ["Phenytoin", "Eptoin", "Dilantin"],
+      severity: "AVOID",
+      title: "Piperine Induced Phenytoin Neurotoxicity Surge",
+      mechanism: "Piperine inhibits first-pass metabolism and hepatic CYP2C9 clearance of phenytoin, producing a toxic surge in plasma drug levels.",
+      clinicalRisk: "Phenytoin toxicity symptoms: severe ataxia, nystagmus, diplopia, slurred speech, and mental confusion.",
+      recommendation: "Strictly avoid high-dose Trikatu preparations in patients maintained on phenytoin.",
+      hindiWarning: "मिर्गी की दवा (Phenytoin) के साथ त्रिकटु लेने से दवा का स्तर शरीर में बहुत बढ़ सकता है और नसों में कमजोरी व चक्कर आ सकते हैं।",
+      evidenceLevel: "Established",
+      source: "Epilepsy Research / Phytomedicine"
+    },
+    {
+      id: "aahi-015",
+      herb: "Chandraprabha Vati",
+      allopathyGroup: "Anticoagulants / Antiplatelets",
+      allopathyExamples: ["Aspirin", "Ecosprin", "Warfarin", "Clopidogrel"],
+      severity: "AVOID",
+      title: "Guggulu-Platelet Synergy: Critical Bleeding Hazard",
+      mechanism: "Chandraprabha Vati contains purified Guggulu and Haridra which exert additive antiplatelet actions alongside prescription blood thinners.",
+      clinicalRisk: "Severe gastrointestinal bleeding, spontaneous subcutaneous hematomas, and prolonged bleeding times.",
+      recommendation: "Avoid concurrent administration. Discontinue Chandraprabha Vati 10-14 days prior to any elective surgery.",
+      hindiWarning: "चन्द्रप्रभा वटी में गुग्गुल होता है। इसे खून पतला करने वाली दवाओं (Ecosprin, Warfarin) के साथ लेने से गंभीर ब्लीडिंग का खतरा होता है।",
+      evidenceLevel: "Established",
+      source: "Ayush Research Portal / Natural Medicines Database"
+    },
+    {
+      id: "aahi-016",
+      herb: "Dashamoola",
+      allopathyGroup: "Diuretics",
+      allopathyExamples: ["Furosemide", "Lasix", "Hydrochlorothiazide", "Spironolactone"],
+      severity: "CAUTION",
+      title: "Additive Aquaretic/Diuretic Synergy & Electrolyte Flux",
+      mechanism: "Dashamoola includes Gokshura (Tribulus terrestris), which exerts mild natural aquaretic diuretic effects, potentiating loop and thiazide diuretics.",
+      clinicalRisk: "Potential volume depletion, orthostatic hypotension, and electrolyte shifts.",
+      recommendation: "Monitor blood pressure and serum electrolytes if combining regular Dashamoola decoctions with prescription diuretics.",
+      hindiWarning: "दशमूल में गोक्षुर होने के कारण यह पेशाब बढ़ाने वाली दवाओं (Lasix) के असर को तेज कर सकता है। चक्कर आने पर डॉक्टर से संपर्क करें।",
+      evidenceLevel: "Moderate Evidence",
+      source: "Journal of Ethnopharmacology"
     }
   ];
 
   /**
+   * Decomposes a classical polyherbal formulation into its constituent single herbs and active drivers.
+   * @param {string} query - Polyherbal or herb name
+   * @returns {Object|null} Decomposed botanical breakdown or null
+   */
+  function decomposePolyherbal(query) {
+    if (!query || typeof query !== 'string') return null;
+    const q = query.toLowerCase().trim();
+    return CLASSICAL_POLYHERBAL_CATALOG.find(poly => 
+      poly.name.toLowerCase().includes(q) || 
+      q.includes(poly.name.toLowerCase()) ||
+      poly.hindiName.includes(q)
+    ) || null;
+  }
+
+  /**
    * Cross-checks an Ayurvedic medicine/herb against a concurrent allopathic prescription.
+   * Automatically performs recursive polyherbal decomposition to uncover hidden botanical-drug clashes.
+   *
    * @param {string} ayurvedaQuery - Herb or Ayurvedic medicine name
    * @param {string} allopathyQuery - Allopathic drug or generic name
    * @returns {Array<Object>} List of identified clinical interactions
@@ -281,34 +486,75 @@
     const ayur = ayurvedaQuery.toLowerCase().trim();
     const allo = allopathyQuery.toLowerCase().trim();
 
-    return AYURVEDA_ALLOPATHY_INTERACTIONS.filter(rule => {
-      const herbMatch = rule.herb.toLowerCase().includes(ayur) ||
-                        ayur.includes(rule.herb.toLowerCase()) ||
-                        (rule.hindiWarning && rule.hindiWarning.includes(ayur));
+    // Check if the query is a classical polyherbal formulation
+    const polyMatch = decomposePolyherbal(ayur);
+    const searchHerbs = polyMatch ? [ayur, ...polyMatch.mappedSingleHerbs] : [ayur];
 
-      const alloMatch = rule.allopathyGroup.toLowerCase().includes(allo) ||
-                        rule.allopathyExamples.some(ex => ex.toLowerCase().includes(allo) || allo.includes(ex.toLowerCase()));
+    const matchedInteractions = [];
+    const seenIds = new Set();
 
-      return herbMatch && alloMatch;
+    searchHerbs.forEach(herbToken => {
+      const hLower = herbToken.toLowerCase();
+      AYURVEDA_ALLOPATHY_INTERACTIONS.forEach(rule => {
+        if (seenIds.has(rule.id)) return;
+
+        const herbMatch = rule.herb.toLowerCase().includes(hLower) ||
+                          hLower.includes(rule.herb.toLowerCase()) ||
+                          (rule.hindiWarning && rule.hindiWarning.includes(hLower));
+
+        const alloMatch = rule.allopathyGroup.toLowerCase().includes(allo) ||
+                          rule.allopathyExamples.some(ex => ex.toLowerCase().includes(allo) || allo.includes(ex.toLowerCase()));
+
+        if (herbMatch && alloMatch) {
+          seenIds.add(rule.id);
+          const enriched = { ...rule };
+          if (polyMatch && herbToken !== ayur) {
+            enriched.decomposedFrom = polyMatch.name;
+            enriched.constituentDriver = herbToken;
+          }
+          matchedInteractions.push(enriched);
+        }
+      });
     });
+
+    return matchedInteractions;
   }
 
   /**
-   * Returns all known interactions for a given Ayurvedic herb.
+   * Returns all known interactions for a given Ayurvedic herb or polyherbal formulation.
    * @param {string} herbName
    * @returns {Array<Object>}
    */
   function getInteractionsByHerb(herbName) {
     if (!herbName) return [];
     const q = herbName.toLowerCase().trim();
-    return AYURVEDA_ALLOPATHY_INTERACTIONS.filter(r => r.herb.toLowerCase().includes(q) || q.includes(r.herb.toLowerCase()));
+    const polyMatch = decomposePolyherbal(q);
+    const searchHerbs = polyMatch ? [q, ...polyMatch.mappedSingleHerbs] : [q];
+
+    const results = [];
+    const seenIds = new Set();
+
+    searchHerbs.forEach(hToken => {
+      const hLower = hToken.toLowerCase();
+      AYURVEDA_ALLOPATHY_INTERACTIONS.forEach(r => {
+        if (seenIds.has(r.id)) return;
+        if (r.herb.toLowerCase().includes(hLower) || hLower.includes(r.herb.toLowerCase())) {
+          seenIds.add(r.id);
+          results.push(r);
+        }
+      });
+    });
+
+    return results;
   }
 
   root.SMASP = root.SMASP || {};
   root.SMASP.data = root.SMASP.data || {};
   root.SMASP.data.ayurvedaAllopathy = {
     herbs: AYURVEDA_HERB_CATALOG,
+    polyherbals: CLASSICAL_POLYHERBAL_CATALOG,
     interactions: AYURVEDA_ALLOPATHY_INTERACTIONS,
+    decomposePolyherbal,
     evaluateHerbDrugInteraction,
     getInteractionsByHerb
   };
@@ -316,7 +562,9 @@
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
       AYURVEDA_HERB_CATALOG,
+      CLASSICAL_POLYHERBAL_CATALOG,
       AYURVEDA_ALLOPATHY_INTERACTIONS,
+      decomposePolyherbal,
       evaluateHerbDrugInteraction,
       getInteractionsByHerb
     };

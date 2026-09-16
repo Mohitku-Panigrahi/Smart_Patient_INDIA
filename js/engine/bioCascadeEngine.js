@@ -117,9 +117,11 @@
 
   /**
    * Ayurvedic Formulations containing Piperine / Bio-Enhancers
+   * Covers single spices, extracts, and classical polyherbal formulations.
    */
   const PIPERINE_FORMULATIONS = [
-    'trikatu', 'maricha', 'pippali', 'black pepper', 'piper longum', 'piper nigrum', 'churna'
+    'trikatu', 'maricha', 'pippali', 'black pepper', 'piper longum', 'piper nigrum', 'churna',
+    'chyawanprash', 'chandraprabha vati', 'kanchnar guggulu'
   ];
 
   /**
@@ -184,7 +186,8 @@
           drugsInvolved: [...new Set([...matchedNsaids, ...matchedRaas, ...matchedDiuretics])],
           mechanism: 'Three-point collapse of renal autoregulation: (1) NSAID constricts afferent renal arteriole, (2) ACEi/ARB dilates efferent arteriole, (3) Diuretic induces plasma hypovolemia. Glomerular filtration pressure collapses precipitously.',
           clinicalRisk: 'Catastrophic Acute Kidney Injury (AKI), acute tubular necrosis, and fatal hyperkalemia.',
-          actionableGuidance: 'Avoid combination. In hypertensive patients on ACEi/ARB + Diuretic, replace NSAID with Paracetamol for analgesia. Regularly monitor serum creatinine and eGFR.',
+          actionableGuidance: 'CRITICAL HARM-REDUCTION ADVISORY: Discuss with your doctor immediately to PAUSE or REPLACE the NSAID (painkiller) (e.g. substitute Combiflam/Ibuprofen with topical therapy or Paracetamol). DO NOT stop blood pressure medications (ACEi/ARB) or diuretics on your own, as abrupt cessation triggers acute hypertensive crisis and congestive pulmonary edema. Request urgent renal function (eGFR/creatinine) and potassium lab tests.',
+          harmReductionDirective: '⚠️ MANDATORY GUARDRAIL: Never discontinue prescribed antihypertensive or diuretic therapies without direct physician supervision.',
           evidenceLevel: 'Established',
           source: 'NICE Guidelines / British Journal of Clinical Pharmacology / CDSCO',
           lastVerified: '2026-03-15'
@@ -201,7 +204,8 @@
           drugsInvolved: [...new Set([...matchedNsaids, ...matchedRaas])],
           mechanism: 'NSAID inhibits vasodilatory renal prostaglandins while ARB/ACEi blocks efferent constriction. Blunts antihypertensive efficacy and compromises renal hemodynamics.',
           clinicalRisk: 'Acute elevation in serum creatinine, oliguria, fluid retention, and hyperkalemia.',
-          actionableGuidance: 'Avoid routine co-prescribing. If analgesia required, prefer Paracetamol or topical analgesics.',
+          actionableGuidance: 'CLINICAL ADVISORY: Consult physician regarding replacing the oral NSAID with Paracetamol or local analgesics. Do NOT stop prescribed ACEi/ARB blood pressure medications on your own.',
+          harmReductionDirective: '⚠️ MANDATORY GUARDRAIL: Do not stop cardiovascular medications without physician confirmation.',
           evidenceLevel: 'Established',
           source: 'FDA DailyMed / KDIGO Guidelines',
           lastVerified: '2026-03-15'
@@ -238,8 +242,9 @@
             substrates: substratesFound,
             mechanism: `${inhibitorsFound.join(', ')} strongly inhibits the ${enzyme.toUpperCase()} hepatic isoenzyme, blocking metabolic degradation of ${substratesFound.join(', ')}.`,
             projectedExposureMultiplier: '3x to 8x AUC surge',
-            clinicalRisk: `Systemic drug toxicity due to impaired clearance (e.g. statin rhabdomyolysis, profound benzodiazepine sedation).`,
-            actionableGuidance: `Temporarily withhold ${substratesFound.join(', ')} during therapy with ${inhibitorsFound.join(', ')}, or adjust dose under close monitoring.`,
+            clinicalRisk: `Systemic drug toxicity due to impaired clearance (e.g. severe statin rhabdomyolysis with acute myoglobinuric kidney failure, profound benzodiazepine sedation).`,
+            actionableGuidance: `CLINICAL ACTIONABILITY: When prescribing ${inhibitorsFound.join(', ')}, discuss with your physician whether to temporarily withhold ${substratesFound.join(', ')} for the duration of antimicrobial therapy, or switch to a non-CYP3A4 statin (e.g. Rosuvastatin or Pravastatin). Report unexplained muscle pain or brown urine immediately.`,
+            harmReductionDirective: '⚠️ MANDATORY GUARDRAIL: Consult prescribing doctor before altering lipid-lowering or antimicrobial regimens.',
             evidenceLevel: 'Established',
             source: 'FDA Drug Development & Drug Interactions Database / Flockhart Table',
             lastVerified: '2026-03-15'
@@ -252,6 +257,7 @@
 
     /**
      * 3. Calculates Cumulative Anticholinergic Cognitive Burden (ACB).
+     * Calibrated to the clinical Boustani et al. criteria: ACB >= 3 defines high cognitive/delirium hazard.
      *
      * @param {string[]} drugList - Regimen drugs
      * @param {number} [patientAge=35] - Patient age
@@ -276,14 +282,19 @@
       let riskLevel = 'LOW';
       let title = 'Normal Anticholinergic Burden';
 
-      if (totalScore >= 3 || (isGeriatric && totalScore >= 2)) {
+      if (totalScore >= 3) {
         riskLevel = 'HIGH';
         title = isGeriatric
-          ? '🚨 High Geriatric Cognitive Risk: Critical Anticholinergic Burden'
-          : '⚠️ Significant Anticholinergic Burden (ACB >= 3)';
-      } else if (totalScore >= 1) {
+          ? '🚨 Critical Geriatric Cognitive Risk: Anticholinergic Burden (ACB >= 3)'
+          : '⚠️ Significant Anticholinergic Cognitive Burden (ACB >= 3)';
+      } else if (totalScore === 2) {
+        riskLevel = isGeriatric ? 'HIGH' : 'MODERATE';
+        title = isGeriatric
+          ? '⚠️ Elevated Geriatric Cognitive Risk (ACB = 2 in Age >= 65)'
+          : 'Moderate Anticholinergic Exposure (ACB = 2)';
+      } else if (totalScore === 1) {
         riskLevel = 'MODERATE';
-        title = 'Moderate Anticholinergic Exposure';
+        title = 'Mild Anticholinergic Exposure (ACB = 1)';
       }
 
       return {
@@ -296,8 +307,9 @@
           ? 'Cumulative central muscarinic blockade significantly elevates risk of acute delirium, confusion, memory impairment, falls, and urinary retention in older adults.'
           : 'Mild anticholinergic load. Low probability of central cognitive disturbance in non-geriatric individuals.',
         actionableGuidance: isGeriatric && totalScore >= 2
-          ? 'Deprescribe or substitute high-scoring agents (e.g. replace sedating antihistamines with non-anticholinergic alternatives).'
+          ? 'CLINICAL ADVISORY: Review anticholinergic regimen with geriatrician. Discuss deprescribing or substituting sedating antihistamines/antispasmodics with non-anticholinergic agents.'
           : 'Maintain hydration and observe for dry mouth or blurred vision.',
+        harmReductionDirective: '⚠️ MANDATORY GUARDRAIL: Do not abruptly stop prescription psychotropic medications without physician guidance.',
         evidenceLevel: 'Established',
         source: 'ACB Scale (Boustani et al.) / Beers Criteria 2023',
         lastVerified: '2026-03-15'
@@ -306,6 +318,7 @@
 
     /**
      * 4. Calculates Composite QTc Prolongation Arrhythmia Vector Sum.
+     * Evaluates categorical ventricular repolarization delay without claiming false-precision millisecond values.
      *
      * @param {string[]} drugList - Regimen drugs
      * @returns {Object} Composite QTc risk scoring
@@ -344,14 +357,15 @@
         riskCategory,
         severity,
         contributingDrugs,
-        title: compositeScore >= 3.0 ? '⚡ Additive QTc Interval Prolongation & Arrhythmia Hazard' : 'Low Cardiac Repolarization Risk',
-        mechanism: 'Cumulative blockade of the rapid delayed rectifier cardiac potassium current (I_Kr / hERG channel) by co-administered agents.',
+        title: compositeScore >= 3.0 ? '⚡ Additive Cardiac Repolarization Delay & Arrhythmia Hazard' : 'Normal Cardiac Repolarization Profile',
+        mechanism: 'Cumulative pharmacological blockade of the rapid delayed rectifier cardiac potassium current (I_Kr / hERG channel) by co-administered agents.',
         clinicalRisk: compositeScore >= 3.0
-          ? 'Synergistic prolongation of myocardial ventricular repolarization exceeding 500ms, predisposing to Torsades de Pointes and fatal ventricular fibrillation.'
+          ? 'Synergistic delay of myocardial ventricular repolarization, predisposing to polymorphic ventricular tachycardia (Torsades de Pointes) and syncope.'
           : 'Baseline cardiac repolarization kinetics remain within safe therapeutic thresholds.',
         actionableGuidance: compositeScore >= 3.0
-          ? 'Obtain baseline 12-lead ECG. Correct hypokalemia and hypomagnesemia. Avoid combining Domperidone with Azithromycin or Macrolides.'
+          ? 'CLINICAL ADVISORY: Obtain baseline 12-lead ECG prior to co-administration. Correct hypokalemia and hypomagnesemia. Avoid combining Domperidone with Azithromycin or Macrolides.'
           : 'Standard clinical monitoring.',
+        harmReductionDirective: '⚠️ MANDATORY GUARDRAIL: Do not discontinue cardiac or antimicrobial treatments without physician consultation.',
         evidenceLevel: 'Established',
         source: 'CredibleMeds QTDrugs List / CDSCO Safety Circulars',
         lastVerified: '2026-03-15'
@@ -369,27 +383,33 @@
       const normalizedList = (drugList || []).map(d => this._normalize(d));
       let bleedScore = 0;
       const drivers = [];
+      const weightingBreakdown = [];
 
       normalizedList.forEach(drug => {
         if (drug.includes('warfarin') || drug.includes('dabigatran') || drug.includes('rivaroxaban')) {
           bleedScore += 3;
           drivers.push(`${drug} (Anticoagulant)`);
+          weightingBreakdown.push({ factor: drug, category: 'Enzymatic Coagulation Factor Inhibition', points: 3 });
         }
         if (drug.includes('aspirin') || drug.includes('ecosprin') || drug.includes('clopidogrel')) {
           bleedScore += 2;
           drivers.push(`${drug} (Antiplatelet)`);
+          weightingBreakdown.push({ factor: drug, category: 'Platelet COX-1 / P2Y12 Blockade', points: 2 });
         }
         if (drug.includes('ibuprofen') || drug.includes('combiflam') || drug.includes('diclofenac')) {
           bleedScore += 2;
           drivers.push(`${drug} (NSAID Gastric Mucosal Injury)`);
+          weightingBreakdown.push({ factor: drug, category: 'Topical Mucosal Injury & Prostaglandin Depletion', points: 2 });
         }
         if (drug.includes('sertraline') || drug.includes('fluoxetine')) {
           bleedScore += 1;
           drivers.push(`${drug} (SSRI Platelet Serotonin Depletion)`);
+          weightingBreakdown.push({ factor: drug, category: 'Platelet Serotonin Depletion', points: 1 });
         }
         if (drug.includes('guggulu') || drug.includes('curcumin') || drug.includes('haldi')) {
           bleedScore += 1;
           drivers.push(`${drug} (Herbal Antiplatelet Synergy)`);
+          weightingBreakdown.push({ factor: drug, category: 'Herbal Thromboxane A2 Inhibition Synergy', points: 1 });
         }
       });
 
@@ -397,6 +417,7 @@
       if (conditions.some(c => c.includes('ulcer') || c.includes('bleed'))) {
         bleedScore += 2;
         drivers.push('Pre-existing peptic ulcer / bleeding history');
+        weightingBreakdown.push({ factor: 'History of Peptic Ulcer / Bleeding', category: 'Pre-existing Endothelial Vulnerability', points: 2 });
       }
 
       let level = 'LOW';
@@ -408,14 +429,16 @@
         bleedScore,
         level,
         drivers,
-        title: bleedScore >= 3 ? '🩸 Compounded Systemic & Gastrointestinal Hemorrhage Risk' : 'Normal Hemostatic Profile',
+        weightingBreakdown,
+        title: bleedScore >= 3 ? '🩸 Compounded Systemic & Gastrointestinal Hemorrhage Hazard' : 'Normal Hemostatic Profile',
         mechanism: 'Multi-pathway hemostatic impairment: Combined enzymatic coagulation factor inhibition, platelet cyclooxygenase-1 blockade, and mucosal prostaglandin depletion.',
         clinicalRisk: bleedScore >= 3
-          ? 'Major upper gastrointestinal bleeding, spontaneous hematomas, epistaxis, or melena.'
+          ? 'Major upper gastrointestinal hemorrhage, spontaneous hematomas, epistaxis, or melena.'
           : 'Low systemic bleeding tendency under standard therapeutic dosing.',
         actionableGuidance: bleedScore >= 3
-          ? 'Prescribe concurrent proton pump inhibitor (PPI) gastroprotection. Avoid unmonitored NSAID use.'
-          : 'Standard vigilance.',
+          ? 'CLINICAL ADVISORY: Review bleeding risk with physician. Prescribe concurrent proton pump inhibitor (PPI) gastroprotection (e.g. Pantoprazole) if antiplatelet/NSAID combination is medically unavoidable.'
+          : 'Standard clinical vigilance.',
+        harmReductionDirective: '⚠️ MANDATORY GUARDRAIL: Do not stop prescribed blood thinners without consulting your cardiologist or physician.',
         evidenceLevel: 'Established',
         source: 'HAS-BLED Adapted Criteria / FDA DailyMed',
         lastVerified: '2026-03-15'
@@ -447,7 +470,9 @@
             title: `🌿 Bio-Enhancer Surge: Piperine + ${alloDrug.toUpperCase()}`,
             mechanism: 'Trikatu / Piperine is an ancient Ayurvedic bio-enhancer (Yogavahi) that strongly inhibits intestinal P-glycoprotein efflux pumps and hepatic CYP3A4, dramatically increasing oral bioavailability.',
             clinicalRisk: match.risk,
-            actionableGuidance: 'Separate administration by at least 4 hours. Monitor therapeutic drug levels closely.',
+            doseDependenceCaveat: 'Bio-enhancement magnitude is dose- and extract-dependent: standardized Ayurvedic extracts (e.g. Trikatu capsules/tablets) exert significantly greater P-gp/CYP3A4 inhibition than modest culinary spice use in food.',
+            actionableGuidance: 'CLINICAL ADVISORY: Separate ingestion by at least 4 hours. Inform physician of herbal supplement use; therapeutic drug monitoring may be required.',
+            harmReductionDirective: '⚠️ MANDATORY GUARDRAIL: Do not adjust prescribed antidiabetic, antiepileptic, or cardiovascular medicine doses without physician confirmation.',
             evidenceLevel: 'Established',
             source: 'Ayurvedic Pharmacopoeia of India / Clinical Pharmacokinetics',
             lastVerified: '2026-03-15'
@@ -483,6 +508,7 @@
       return {
         timestamp: new Date().toISOString(),
         hasCriticalAlerts,
+        universalHarmReductionDirective: '⚠️ MANDATORY HARM-REDUCTION DIRECTIVE: Do NOT stop or alter any prescribed chronic medicine (blood pressure, diabetes, heart, epilepsy, or psychiatric) on your own. Abrupt cessation carries severe rebound risk. Discuss all alerts with your prescribing physician.',
         tripleWhammy,
         cypBottlenecks,
         acbBurden,

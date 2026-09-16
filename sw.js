@@ -4,7 +4,7 @@
  * Caches HTML, CSS, JS, and data/medicines.json for 100% offline availability.
  */
 
-const CACHE_NAME = 'smasp-india-v4';
+const CACHE_NAME = 'smasp-india-v4-1';
 
 const CORE_ASSETS = [
   './',

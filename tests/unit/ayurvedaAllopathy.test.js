@@ -1,6 +1,8 @@
 const {
   AYURVEDA_HERB_CATALOG,
+  CLASSICAL_POLYHERBAL_CATALOG,
   AYURVEDA_ALLOPATHY_INTERACTIONS,
+  decomposePolyherbal,
   evaluateHerbDrugInteraction,
   getInteractionsByHerb
 } = require('../../js/data/ayurvedaAllopathy.js');
@@ -11,6 +13,42 @@ describe('Ayurveda–Allopathy Herb-Drug Interaction Matrix', () => {
     const ashwa = AYURVEDA_HERB_CATALOG.find(h => h.commonName === 'Ashwagandha');
     expect(ashwa).toBeDefined();
     expect(ashwa.hindiName).toBe('अश्वगंधा');
+  });
+
+  test('should load classical polyherbal formulations catalog', () => {
+    expect(CLASSICAL_POLYHERBAL_CATALOG.length).toBeGreaterThanOrEqual(5);
+    const chyawanprash = CLASSICAL_POLYHERBAL_CATALOG.find(p => p.name === 'Chyawanprash');
+    expect(chyawanprash).toBeDefined();
+    expect(chyawanprash.botanicalConstituents.length).toBeGreaterThanOrEqual(4);
+  });
+
+  test('should decompose polyherbal formulation (Chyawanprash) into constituent single herbs', () => {
+    const decomp = decomposePolyherbal('Chyawanprash');
+    expect(decomp).not.toBeNull();
+    expect(decomp.name).toBe('Chyawanprash');
+    expect(decomp.mappedSingleHerbs).toContain('Giloy / Guduchi');
+    expect(decomp.mappedSingleHerbs).toContain('Ashwagandha');
+  });
+
+  test('should recursively detect interactions for polyherbal formulations (Chyawanprash + Prednisolone)', () => {
+    // Chyawanprash contains Guduchi (Giloy) which opposes immunosuppressants
+    const hits = evaluateHerbDrugInteraction('Chyawanprash', 'Prednisolone');
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+    expect(hits.some(h => h.decomposedFrom === 'Chyawanprash')).toBe(true);
+    expect(hits.some(h => h.severity === 'AVOID')).toBe(true);
+  });
+
+  test('should detect Chandraprabha Vati bleeding interaction with Aspirin/Ecosprin', () => {
+    // Chandraprabha Vati contains Guggulu
+    const hits = evaluateHerbDrugInteraction('Chandraprabha Vati', 'Ecosprin');
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+    expect(hits[0].severity).toBe('AVOID');
+  });
+
+  test('should detect Trikatu bio-enhancer surge with Metformin', () => {
+    const hits = evaluateHerbDrugInteraction('Trikatu', 'Metformin');
+    expect(hits.length).toBeGreaterThanOrEqual(1);
+    expect(hits[0].title).toContain('Piperine Bio-Enhancer Surge');
   });
 
   test('should detect high-severity interaction between Ashwagandha and Sedatives', () => {

@@ -253,6 +253,9 @@ def test_backend_bio_cascades_service_evaluation():
     assert cascades["triple_whammy"] is not None
     assert cascades["triple_whammy"]["severity"] == "CRITICAL"
     assert "Three-point collapse" in cascades["triple_whammy"]["mechanism"]
+    assert "PAUSE or REPLACE the NSAID" in cascades["triple_whammy"]["actionable_guidance"]
+    assert "DO NOT stop blood pressure medications" in cascades["triple_whammy"]["actionable_guidance"]
+    assert "universal_harm_reduction_directive" in cascades
 
     # 2. CYP3A4 bottleneck
     assert len(cascades["cyp_bottlenecks"]) >= 1
@@ -261,10 +264,13 @@ def test_backend_bio_cascades_service_evaluation():
     # 3. Geriatric ACB burden
     assert cascades["acb_burden"]["is_geriatric"] is True
 
-    # 4. Ayurvedic bio-enhancer surge
+    # 4. Ayurvedic bio-enhancer surge (including polyherbals)
     bio_enhancers = service.evaluate_bio_cascades(["Metformin"], ["Trikatu"])
     assert len(bio_enhancers["bio_enhancers"]) >= 1
     assert "Piperine" in bio_enhancers["bio_enhancers"][0]["title"]
+
+    poly_enhancers = service.evaluate_bio_cascades(["Metformin"], ["Chyawanprash"])
+    assert len(poly_enhancers["bio_enhancers"]) >= 1
 
 def test_api_evaluate_cascades_endpoint():
     payload = {
@@ -279,5 +285,7 @@ def test_api_evaluate_cascades_endpoint():
     assert data["status"] == "success"
     cascades = data["bio_cascades"]
     assert cascades["triple_whammy"]["severity"] == "CRITICAL"
+    assert "universal_harm_reduction_directive" in cascades
+
 
 

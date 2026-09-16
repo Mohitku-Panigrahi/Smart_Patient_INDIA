@@ -579,7 +579,8 @@ class MedicineService:
                 "title": "The Triple Whammy: Glomerular Hemodynamic Collapse",
                 "mechanism": "Three-point collapse of renal autoregulation: (1) NSAID constricts afferent arteriole, (2) ACEi/ARB dilates efferent arteriole, (3) Diuretic induces volume depletion. Glomerular filtration pressure collapses.",
                 "clinical_risk": "Catastrophic Acute Kidney Injury (AKI), acute tubular necrosis, and severe hyperkalemia.",
-                "actionable_guidance": "Avoid combination. Replace NSAID with Paracetamol for analgesia in patients on ACEi/ARB + Diuretic.",
+                "actionable_guidance": "CRITICAL HARM-REDUCTION ADVISORY: Discuss with doctor immediately to PAUSE or REPLACE the NSAID with Paracetamol/topicals. DO NOT stop blood pressure medications (ACEi/ARB) or diuretics on your own, as abrupt cessation triggers acute hypertensive crisis.",
+                "harm_reduction_directive": "MANDATORY GUARDRAIL: Never stop prescribed antihypertensive or diuretic medicines without physician supervision.",
                 "evidence_level": "Established",
                 "source": "NICE Guidelines / British Journal of Clinical Pharmacology / CDSCO"
             }
@@ -590,7 +591,8 @@ class MedicineService:
                 "title": "NSAID + Renin-Angiotensin Blockade: Renal Hemodynamic Strain",
                 "mechanism": "NSAID inhibits vasodilatory renal prostaglandins while ARB/ACEi blocks efferent constriction.",
                 "clinical_risk": "Acute elevation in serum creatinine, fluid retention, and hyperkalemia.",
-                "actionable_guidance": "Avoid routine co-prescribing. Substitute with Paracetamol.",
+                "actionable_guidance": "CLINICAL ADVISORY: Inquire with physician regarding substituting NSAID with Paracetamol. Do not stop blood pressure medicines.",
+                "harm_reduction_directive": "MANDATORY GUARDRAIL: Do not stop cardiovascular medications without physician confirmation.",
                 "evidence_level": "Established",
                 "source": "FDA DailyMed / KDIGO Guidelines"
             }
@@ -606,7 +608,8 @@ class MedicineService:
                 "mechanism": "Macrolide/Azole strongly inhibits CYP3A4, collapsing hepatic first-pass degradation of statin.",
                 "projected_exposure_multiplier": "4x to 8x AUC surge",
                 "clinical_risk": "Severe rhabdomyolysis, myoglobinuria, and acute renal tubular necrosis.",
-                "actionable_guidance": "Temporarily suspend Atorvastatin during Clarithromycin therapy.",
+                "actionable_guidance": "CLINICAL ACTIONABILITY: When prescribing antimicrobials, discuss temporarily holding Atorvastatin or switching to a non-CYP3A4 statin (e.g. Rosuvastatin or Pravastatin).",
+                "harm_reduction_directive": "MANDATORY GUARDRAIL: Consult prescribing physician before altering statin or antibiotic therapies.",
                 "evidence_level": "Established",
                 "source": "FDA DailyMed / Flockhart Table"
             })
@@ -623,8 +626,10 @@ class MedicineService:
             "total_score": total_acb,
             "risk_level": "HIGH" if (total_acb >= 3 or (is_geriatric and total_acb >= 2)) else "MODERATE" if total_acb >= 1 else "LOW",
             "is_geriatric": is_geriatric,
-            "title": "High Geriatric Cognitive Impairment Risk" if (is_geriatric and total_acb >= 2) else "Anticholinergic Burden Score",
+            "title": "Critical Geriatric Anticholinergic Burden (ACB >= 3)" if (total_acb >= 3 and is_geriatric) else "High Geriatric Anticholinergic Risk" if (is_geriatric and total_acb >= 2) else "Anticholinergic Cognitive Burden Score",
             "clinical_risk": "Cumulative muscarinic receptor blockade predisposing older adults to acute delirium, confusion, falls, and urinary retention." if (total_acb >= 2 and is_geriatric) else "Mild peripheral anticholinergic exposure.",
+            "actionable_guidance": "Review anticholinergic load with physician or geriatrician for potential deprescribing." if (total_acb >= 2 and is_geriatric) else "Maintain hydration and standard observation.",
+            "harm_reduction_directive": "MANDATORY GUARDRAIL: Do not abruptly stop prescription psychotropic drugs without medical supervision.",
             "evidence_level": "Established",
             "source": "ACB Scale (Boustani et al.) / Beers Criteria 2023"
         }
@@ -638,41 +643,62 @@ class MedicineService:
         qtc_risk = {
             "composite_score": qtc_score,
             "severity": "AVOID" if qtc_score >= 5.0 else "CAUTION" if qtc_score >= 3.0 else "SAFE",
-            "title": "Additive QTc Interval Prolongation & Arrhythmia Hazard" if qtc_score >= 3.0 else "Normal Repolarization Profile",
+            "title": "Additive Cardiac Repolarization Delay & Arrhythmia Hazard" if qtc_score >= 3.0 else "Normal Repolarization Profile",
             "mechanism": "Cumulative blockade of cardiac hERG potassium channels (I_Kr) delaying myocardial repolarization.",
-            "clinical_risk": "Synergistic prolongation exceeding 500ms, predisposing to Torsades de Pointes and ventricular fibrillation.",
+            "clinical_risk": "Synergistic prolongation predisposing to polymorphic ventricular tachycardia (Torsades de Pointes) and syncope.",
+            "actionable_guidance": "CLINICAL ADVISORY: Obtain baseline 12-lead ECG prior to co-administration. Correct hypokalemia and hypomagnesemia.",
+            "harm_reduction_directive": "MANDATORY GUARDRAIL: Do not stop cardiac or anti-infective medications without physician advice.",
             "evidence_level": "Established",
             "source": "CredibleMeds QTDrugs List / CDSCO Safety Notice"
         }
 
         # 5. Cumulative Hemorrhagic Bleeding Risk
         bleed_score = 0
-        if any(k in med_str for k in ["warfarin", "dabigatran"]): bleed_score += 3
-        if any(k in med_str for k in ["aspirin", "ecosprin", "clopidogrel"]): bleed_score += 2
-        if any(k in med_str for k in ["ibuprofen", "combiflam", "diclofenac"]): bleed_score += 2
-        if any(k in med_str for k in ["sertraline", "fluoxetine"]): bleed_score += 1
-        if any(k in herb_str for k in ["guggulu", "curcumin", "haldi"]): bleed_score += 1
-        if "ulcer" in str(patient_profile.get("conditions", [])).lower(): bleed_score += 2
+        weighting_breakdown = []
+        if any(k in med_str for k in ["warfarin", "dabigatran"]):
+            bleed_score += 3
+            weighting_breakdown.append({"category": "Anticoagulant", "points": 3})
+        if any(k in med_str for k in ["aspirin", "ecosprin", "clopidogrel"]):
+            bleed_score += 2
+            weighting_breakdown.append({"category": "Antiplatelet", "points": 2})
+        if any(k in med_str for k in ["ibuprofen", "combiflam", "diclofenac"]):
+            bleed_score += 2
+            weighting_breakdown.append({"category": "NSAID Gastric Mucosal Injury", "points": 2})
+        if any(k in med_str for k in ["sertraline", "fluoxetine"]):
+            bleed_score += 1
+            weighting_breakdown.append({"category": "SSRI Platelet Serotonin Depletion", "points": 1})
+        if any(k in herb_str for k in ["guggulu", "curcumin", "haldi", "chandraprabha", "kanchnar"]):
+            bleed_score += 1
+            weighting_breakdown.append({"category": "Herbal Antiplatelet Synergy", "points": 1})
+        if "ulcer" in str(patient_profile.get("conditions", [])).lower():
+            bleed_score += 2
+            weighting_breakdown.append({"category": "Peptic Ulcer History", "points": 2})
 
         bleed_risk = {
             "bleed_score": bleed_score,
+            "weighting_breakdown": weighting_breakdown,
             "level": "CRITICAL" if bleed_score >= 5 else "HIGH" if bleed_score >= 3 else "MODERATE" if bleed_score >= 2 else "LOW",
             "title": "Compounded Gastrointestinal & Systemic Hemorrhage Hazard" if bleed_score >= 3 else "Baseline Hemostasis",
             "clinical_risk": "Multi-pathway hemostatic impairment: Factor synthesis inhibition + platelet COX-1 blockade + mucosal injury.",
+            "actionable_guidance": "CLINICAL ADVISORY: Review bleeding risk with physician; consider gastroprotection (PPI).",
+            "harm_reduction_directive": "MANDATORY GUARDRAIL: Do not stop prescribed anticoagulants without physician oversight.",
             "evidence_level": "Established",
             "source": "HAS-BLED Adapted Criteria / FDA DailyMed"
         }
 
         # 6. Ayurvedic Bio-Enhancer Surge
         bio_enhancers = []
-        if any(k in herb_str for k in ["trikatu", "maricha", "pippali", "pepper"]):
+        has_piperine_herb = any(k in herb_str for k in ["trikatu", "maricha", "pippali", "pepper", "chyawanprash", "chandraprabha", "kanchnar"])
+        if has_piperine_herb:
             if any(k in med_str for k in ["metformin", "glycomet"]):
                 bio_enhancers.append({
                     "title": "Bio-Enhancer Surge: Piperine + Metformin",
                     "severity": "AVOID",
                     "mechanism": "Piperine inhibits intestinal P-glycoprotein efflux and hepatic CYP3A4, doubling systemic absorption.",
                     "clinical_risk": "Acute precipitous drop in blood glucose / hypoglycemic shock.",
-                    "actionable_guidance": "Separate administration by at least 4 hours.",
+                    "dose_dependence_caveat": "Standardized extracts (e.g. Trikatu tablets) produce far greater absorption increases than culinary black pepper in food.",
+                    "actionable_guidance": "Separate administration by at least 4 hours. Monitor blood glucose closely.",
+                    "harm_reduction_directive": "MANDATORY GUARDRAIL: Do not adjust prescribed antidiabetic doses without physician confirmation.",
                     "evidence_level": "Established",
                     "source": "Ayurvedic Pharmacopoeia of India / Clinical Pharmacokinetics"
                 })
@@ -688,6 +714,7 @@ class MedicineService:
 
         return {
             "has_critical_alerts": has_critical,
+            "universal_harm_reduction_directive": "MANDATORY HARM-REDUCTION DIRECTIVE: Do NOT stop or alter any prescribed chronic medicine on your own. Discuss all alerts with your prescribing physician.",
             "triple_whammy": triple_whammy,
             "cyp_bottlenecks": cyp_bottlenecks,
             "acb_burden": acb_burden,

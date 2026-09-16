@@ -99,6 +99,8 @@ describe('BioCascadeEngine — "God-Level" Multi-Order Physiological Engine', ()
       expect(res.bleedScore).toBeGreaterThanOrEqual(5);
       expect(res.level).toBe('CRITICAL');
       expect(res.drivers.length).toBeGreaterThanOrEqual(4);
+      expect(res.weightingBreakdown.length).toBeGreaterThanOrEqual(4);
+      expect(res.weightingBreakdown.some(w => w.category.includes('Coagulation'))).toBe(true);
     });
   });
 
@@ -112,6 +114,15 @@ describe('BioCascadeEngine — "God-Level" Multi-Order Physiological Engine', ()
       expect(alert.severity).toBe('AVOID');
       expect(alert.title).toContain('Bio-Enhancer Surge');
       expect(alert.mechanism).toContain('P-glycoprotein');
+      expect(alert.doseDependenceCaveat).toBeDefined();
+    });
+
+    test('should recognize classical polyherbals containing Piperine (Chyawanprash & Chandraprabha Vati)', () => {
+      const alertsChyawan = engine.evaluateAyurvedicBioEnhancement(['Chyawanprash'], ['Metformin']);
+      expect(alertsChyawan.length).toBeGreaterThanOrEqual(1);
+
+      const alertsChandra = engine.evaluateAyurvedicBioEnhancement(['Chandraprabha Vati'], ['Phenytoin']);
+      expect(alertsChandra.length).toBeGreaterThanOrEqual(1);
     });
 
     test('should return empty when no bio-enhancing herbs are present', () => {
@@ -122,18 +133,22 @@ describe('BioCascadeEngine — "God-Level" Multi-Order Physiological Engine', ()
     });
   });
 
-  describe('7. Master Aggregator: evaluateFullBioCascade', () => {
-    test('should synthesize full multi-drug physiological cascade', () => {
-      const drugs = ['Combiflam', 'Telma 40', 'Lasix', 'Azithral 500', 'Pan-D'];
+  describe('7. Master Aggregator: evaluateFullBioCascade & Harm Reduction Directives', () => {
+    test('should synthesize full multi-drug physiological cascade and provide universal harm-reduction directive', () => {
+      const drugs = ['Combiflam', 'Telma 40', 'Lasix', 'Azithral 500', 'Pan-D', 'Metformin 500'];
       const herbs = ['Trikatu'];
       const profile = { age: 70, conditions: ['hypertension'] };
 
       const res = engine.evaluateFullBioCascade(drugs, herbs, profile);
       expect(res.hasCriticalAlerts).toBe(true);
       expect(res.tripleWhammy).not.toBeNull();
+      expect(res.tripleWhammy.actionableGuidance).toContain('PAUSE or REPLACE the NSAID');
+      expect(res.tripleWhammy.actionableGuidance).toContain('DO NOT stop blood pressure medications');
       expect(res.qtcRisk.severity).toBe('AVOID');
+      expect(res.qtcRisk.actionableGuidance).toContain('12-lead ECG');
       expect(res.acbBurden.isGeriatric).toBe(true);
-      expect(res.bioEnhancers.length).toBeGreaterThanOrEqual(0);
+      expect(res.bioEnhancers.length).toBeGreaterThanOrEqual(1);
+      expect(res.universalHarmReductionDirective).toContain('MANDATORY HARM-REDUCTION DIRECTIVE');
     });
   });
 });
