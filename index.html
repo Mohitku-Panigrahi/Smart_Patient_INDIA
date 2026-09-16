@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SMASP — Smart Patient | Evidence-Based Medicine Awareness</title>
+  <meta name="description" content="Search 76+ medicines with personalized risk scoring, calm plain-English advice, and real-time polypharmacy interaction checking." />
+
+  <!-- PWA & Mobile Meta -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f6fff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="SMASP" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💊</text></svg>" />
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              900: '#1e3a8a',
+            },
+            calm: {
+              safeBg: '#f0fdf4',
+              safeBorder: '#86efac',
+              safeText: '#15803d',
+              cautionBg: '#fffbeb',
+              cautionBorder: '#fde047',
+              cautionText: '#b45309',
+              avoidBg: '#fef2f2',
+              avoidBorder: '#fca5a5',
+              avoidText: '#b91c1c',
+            }
+          },
+          fontFamily: {
+            sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Custom Micro-Styles for Shimmer & Accessible Tooltips -->
+  <style>
+    @keyframes shimmer {
+      0% { background-position: -800px 0; }
+      100% { background-position: 800px 0; }
+    }
+    .skeleton-box {
+      background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+      background-size: 800px 100%;
+      animation: shimmer 1.5s infinite;
+    }
+    .dark .skeleton-box {
+      background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%);
+      background-size: 800px 100%;
+    }
+    .drawer-overlay {
+      transition: opacity 0.3s ease-in-out;
+    }
+    .drawer-panel {
+      transition: transform 0.3s ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-900 dark:text-slate-100 flex flex-col min-h-full font-sans antialiased text-[18px] leading-relaxed transition-colors duration-200">
+
+  <!-- Header / Navigation -->
+  <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+      <a href="index.html" class="flex items-center gap-3 group focus:outline-none focus:ring-2 focus:ring-brand-500 rounded-lg p-1">
+        <span class="text-3xl filter drop-shadow-sm transition-transform group-hover:scale-110">💊</span>
+        <div>
+          <span class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Smart Patient <span class="text-orange-500 font-extrabold">India</span> 🇮🇳</span>
+          <span class="hidden sm:inline-block ml-2 text-xs font-bold px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">AI Safety v2.2</span>
+        </div>
+      </a>
+
+      <div class="flex items-center gap-2 sm:gap-4">
+        <!-- AI Adverse Drug Reaction ML Predictor Quick Trigger -->
+        <button id="openAdrBtn" type="button" class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-extrabold bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-md transition focus:outline-none focus:ring-2 focus:ring-purple-500" aria-label="Open AI Adverse Drug Reaction Risk Predictor">
+          <span>⚡ AI ADR Model</span>
+        </button>
+
+        <!-- Health Profile Quick Button -->
+        <button id="openProfileBtn" type="button" class="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl text-sm font-semibold bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 transition focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Edit personal health profile">
+          <span class="text-base">👤</span>
+          <span id="profileSummaryText" class="hidden md:inline">Profile: Standard</span>
+          <span class="md:hidden">Profile</span>
+        </button>
+
+        <!-- My Medicines Cabinet Button (Opens Drawer) -->
+        <button id="openCabinetBtn" type="button" class="relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold bg-brand-600 hover:bg-brand-700 text-white shadow-sm transition focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Open My Medicines Cabinet">
+          <span>📦 Cabinet</span>
+          <span id="cabinetCountBadge" class="bg-white text-brand-700 text-xs px-2 py-0.5 rounded-full font-extrabold">0</span>
+        </button>
+
+        <!-- Dark Mode Toggle -->
+        <button id="darkToggle" type="button" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition focus:outline-none focus:ring-2 focus:ring-brand-500" aria-label="Toggle Dark Mode">
+          🌙
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8 sm:py-12 space-y-10">
+
+    <!-- Hero & Search Section -->
+    <section class="text-center max-w-3xl mx-auto space-y-6">
+      <div class="inline-flex flex-wrap items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-orange-50 via-emerald-50 to-blue-50 dark:from-orange-950/30 dark:via-emerald-950/30 dark:to-blue-950/30 text-slate-800 dark:text-slate-200 text-xs sm:text-sm font-bold border border-slate-200 dark:border-slate-800">
+        <span class="text-orange-600 dark:text-orange-400">🇮🇳 India Pharma AI</span>
+        <span>•</span>
+        <span class="text-emerald-600 dark:text-emerald-400">Jan Aushadhi Savings</span>
+        <span>•</span>
+        <span class="text-indigo-600 dark:text-indigo-400">Ayurveda–Allopathy Matrix</span>
+        <span>•</span>
+        <span class="text-purple-600 dark:text-purple-400">ML ADR Predictor</span>
+      </div>
+
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
+        Know Your Medicine, <br class="hidden sm:inline" />
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-brand-600 to-emerald-600 dark:from-orange-400 dark:via-brand-400 dark:to-emerald-400">Without the Fear.</span>
+      </h1>
+
+      <p class="text-base sm:text-lg text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+        Evidence-based medicine safety tailored to India's unique pharma market. Compare Indian brand prices against Pradhan Mantri Jan Aushadhi generic alternatives, check unmonitored Ayurveda–Allopathy interactions, and predict adverse drug reactions using machine learning.
+      </p>
+
+      <!-- Search Input Container -->
+      <div class="relative max-w-2xl mx-auto pt-2">
+        <div class="relative flex items-center shadow-lg rounded-2xl bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 focus-within:border-brand-500 focus-within:ring-4 focus-within:ring-brand-500/20 transition-all">
+          <span class="pl-5 text-slate-400 text-xl pointer-events-none" aria-hidden="true">🔍</span>
+          <input
+            type="text"
+            id="searchInput"
+            class="w-full py-4 pl-4 pr-12 text-lg bg-transparent text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none rounded-2xl"
+            placeholder="Search Indian brand (Dolo, Augmentin, Pan-D), generic, herb, or symptom..."
+            aria-label="Search medicines"
+            autocomplete="off"
+          />
+          <button id="clearSearchBtn" type="button" class="hidden absolute right-4 p-1 rounded-full text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" aria-label="Clear search">
+            ✕
+          </button>
+        </div>
+      </div>
+
+      <!-- Active Profile Indicator Banner -->
+      <div id="profileBanner" class="flex flex-wrap items-center justify-center gap-2 p-3 rounded-xl bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-sm text-slate-600 dark:text-slate-300">
+        <span>Dynamic risk evaluation active for:</span>
+        <span id="activeProfileDetails" class="font-bold text-slate-900 dark:text-white">Adult (Standard Profile)</span>
+        <button id="editProfileQuickBtn" class="text-brand-600 dark:text-brand-400 font-bold underline ml-1 hover:text-brand-700">Customize</button>
+      </div>
+
+      <!-- Category Filter Chips -->
+      <div class="flex flex-wrap justify-center gap-2 pt-2" role="tablist" aria-label="Filter by category">
+        <button class="cat-chip active px-4 py-2 rounded-xl text-sm font-semibold transition border border-brand-500 bg-brand-600 text-white shadow-sm" data-category="all" role="tab" aria-selected="true">All Medicines</button>
+        <button class="cat-chip px-4 py-2 rounded-xl text-sm font-bold transition border border-orange-300 dark:border-orange-800 bg-orange-50 dark:bg-orange-950/40 text-orange-700 dark:text-orange-300 hover:border-orange-500" data-category="indian-pharma" role="tab" aria-selected="false">🇮🇳 Indian Brands & Jan Aushadhi</button>
+        <button class="cat-chip px-4 py-2 rounded-xl text-sm font-bold transition border border-emerald-300 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 hover:border-emerald-500" data-category="ayurveda" role="tab" aria-selected="false">🌿 Ayurveda Combos</button>
+        <button class="cat-chip px-4 py-2 rounded-xl text-sm font-semibold transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-brand-500" data-category="Pain / Fever" role="tab" aria-selected="false">🩹 Pain / Fever</button>
+        <button class="cat-chip px-4 py-2 rounded-xl text-sm font-semibold transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-brand-500" data-category="Antibiotic" role="tab" aria-selected="false">🦠 Antibiotics</button>
+        <button class="cat-chip px-4 py-2 rounded-xl text-sm font-semibold transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-brand-500" data-category="Stomach / GI" role="tab" aria-selected="false">🫃 Stomach & GI</button>
+        <button class="cat-chip px-4 py-2 rounded-xl text-sm font-semibold transition border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:border-brand-500" data-category="Chronic" role="tab" aria-selected="false">❤️ Chronic Care</button>
+      </div>
+    </section>
+
+    <!-- Results Section -->
+    <section class="space-y-6">
+      <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div>
+          <h2 id="resultsHeading" class="text-xl font-bold text-slate-900 dark:text-white">All Medicines</h2>
+          <p id="resultsSubheading" class="text-sm text-slate-500 dark:text-slate-400">Showing all available medications</p>
+        </div>
+        <span id="resultsCountBadge" class="text-sm font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-lg">Loading...</span>
+      </div>
+
+      <!-- Medicine Cards Grid -->
+      <div id="medicineGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-live="polite">
+        <!-- Skeleton Loaders -->
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-4">
+          <div class="skeleton-box h-6 w-24 rounded-full"></div>
+          <div class="skeleton-box h-8 w-3/4 rounded-lg"></div>
+          <div class="skeleton-box h-16 w-full rounded-lg"></div>
+          <div class="skeleton-box h-10 w-full rounded-xl"></div>
+        </div>
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-4">
+          <div class="skeleton-box h-6 w-24 rounded-full"></div>
+          <div class="skeleton-box h-8 w-3/4 rounded-lg"></div>
+          <div class="skeleton-box h-16 w-full rounded-lg"></div>
+          <div class="skeleton-box h-10 w-full rounded-xl"></div>
+        </div>
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-4">
+          <div class="skeleton-box h-6 w-24 rounded-full"></div>
+          <div class="skeleton-box h-8 w-3/4 rounded-lg"></div>
+          <div class="skeleton-box h-16 w-full rounded-lg"></div>
+          <div class="skeleton-box h-10 w-full rounded-xl"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Slide-Over Drawer: My Medicines Cabinet & Polypharmacy Interaction Checker -->
+  <div id="cabinetDrawer" class="fixed inset-0 z-50 overflow-hidden hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+    <div id="drawerBackdrop" class="drawer-overlay fixed inset-0 bg-slate-900/60 backdrop-blur-sm opacity-0 transition-opacity"></div>
+    <div class="fixed inset-y-0 right-0 pl-10 max-w-full flex">
+      <div id="drawerPanel" class="drawer-panel w-screen max-w-md bg-white dark:bg-slate-800 shadow-2xl border-l border-slate-200 dark:border-slate-700 transform translate-x-full transition-transform flex flex-col">
+
+        <!-- Drawer Header -->
+        <div class="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">📦</span>
+            <div>
+              <h3 id="slide-over-title" class="text-xl font-bold text-slate-900 dark:text-white">My Medicines Cabinet</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Live Polypharmacy Interaction Check</p>
+            </div>
+          </div>
+          <button id="closeCabinetBtn" type="button" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700" aria-label="Close cabinet drawer">
+            ✕
+          </button>
+        </div>
+
+        <!-- Drawer Content -->
+        <div class="flex-grow overflow-y-auto p-6 space-y-6">
+
+          <!-- Polypharmacy Analysis Widget -->
+          <div id="interactionAnalysisBox" class="p-4 rounded-2xl border transition-all space-y-3">
+            <!-- Rendered dynamically by checkCabinetInteractions() -->
+          </div>
+
+          <!-- Saved Medicines List -->
+          <div class="space-y-3">
+            <div class="flex items-center justify-between">
+              <h4 class="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Saved Medicines (<span id="drawerItemCount">0</span>)</h4>
+              <button id="clearCabinetBtn" class="text-xs text-red-600 dark:text-red-400 font-bold hover:underline">Clear All</button>
+            </div>
+            <div id="cabinetList" class="space-y-2">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Drawer Footer -->
+        <div class="p-6 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex gap-3">
+          <button id="closeCabinetBtn2" type="button" class="w-full py-3 px-4 rounded-xl text-center font-bold bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 hover:bg-slate-300 dark:hover:bg-slate-600 transition">
+            Close Cabinet
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Personal Health Profile Configurator -->
+  <div id="profileModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+      <div id="modalBackdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"></div>
+      <div class="inline-block align-bottom bg-white dark:bg-slate-800 rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-slate-200 dark:border-slate-700 p-6 sm:p-8 space-y-6">
+
+        <div class="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 pb-4">
+          <div class="flex items-center gap-3">
+            <span class="text-2xl">👤</span>
+            <div>
+              <h3 id="modal-title" class="text-xl font-bold text-slate-900 dark:text-white">Your Health Profile</h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Used strictly locally on your device for personalized safety scoring</p>
+            </div>
+          </div>
+          <button id="closeProfileModalBtn" class="p-2 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200" aria-label="Close modal">✕</button>
+        </div>
+
+        <form id="profileForm" class="space-y-4 text-sm">
+          <!-- Age Group -->
+          <div>
+            <label for="profileAge" class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Age in Years</label>
+            <input type="number" id="profileAge" min="1" max="120" value="35" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+          </div>
+
+          <!-- Pregnancy & Nursing -->
+          <div class="grid grid-cols-2 gap-3 pt-1">
+            <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40 cursor-pointer hover:border-brand-500">
+              <input type="checkbox" id="profilePregnant" class="rounded text-brand-600 focus:ring-brand-500 h-4 w-4" />
+              <span class="font-semibold text-slate-800 dark:text-slate-200">Pregnant</span>
+            </label>
+            <label class="flex items-center gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40 cursor-pointer hover:border-brand-500">
+              <input type="checkbox" id="profileNursing" class="rounded text-brand-600 focus:ring-brand-500 h-4 w-4" />
+              <span class="font-semibold text-slate-800 dark:text-slate-200">Breastfeeding</span>
+            </label>
+          </div>
+
+          <!-- Chronic Health Conditions -->
+          <div>
+            <label class="block font-bold text-slate-700 dark:text-slate-300 mb-2">Existing Health Conditions</label>
+            <div class="grid grid-cols-2 gap-2 text-xs font-semibold">
+              <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 cursor-pointer">
+                <input type="checkbox" value="hypertension" class="condition-check rounded text-brand-600 h-4 w-4" />
+                <span>High Blood Pressure</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 cursor-pointer">
+                <input type="checkbox" value="diabetes" class="condition-check rounded text-brand-600 h-4 w-4" />
+                <span>Diabetes</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 cursor-pointer">
+                <input type="checkbox" value="kidney" class="condition-check rounded text-brand-600 h-4 w-4" />
+                <span>Kidney Issues</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 cursor-pointer">
+                <input type="checkbox" value="liver" class="condition-check rounded text-brand-600 h-4 w-4" />
+                <span>Liver Sensitivity</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 cursor-pointer">
+                <input type="checkbox" value="asthma" class="condition-check rounded text-brand-600 h-4 w-4" />
+                <span>Asthma / Respiratory</span>
+              </label>
+              <label class="flex items-center gap-2 p-2 rounded-lg bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 cursor-pointer">
+                <input type="checkbox" value="ulcer" class="condition-check rounded text-brand-600 h-4 w-4" />
+                <span>Stomach Ulcers / Bleeding</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Drug Allergies -->
+          <div>
+            <label for="profileAllergies" class="block font-bold text-slate-700 dark:text-slate-300 mb-1">Drug Allergies (comma separated)</label>
+            <input type="text" id="profileAllergies" placeholder="e.g. penicillin, sulfa, aspirin" class="w-full px-4 py-2.5 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:ring-2 focus:ring-brand-500 focus:outline-none" />
+          </div>
+
+          <div class="pt-4 flex gap-3">
+            <button type="submit" class="w-full py-3 px-4 rounded-xl text-center font-bold bg-brand-600 hover:bg-brand-700 text-white shadow-md transition">
+              Save Profile & Recalculate
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Predictive Adverse Drug Reaction (ADR) ML Model -->
+  <div id="adrModal" class="fixed inset-0 z-50 overflow-y-auto hidden" aria-labelledby="adr-modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+      <div id="adrModalBackdrop" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md transition-opacity"></div>
+      <div class="inline-block align-bottom bg-slate-900 border border-purple-500/30 rounded-3xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full p-6 sm:p-8 space-y-6 text-white">
+
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="h-11 w-11 rounded-2xl bg-purple-600/20 border border-purple-500/40 flex items-center justify-center text-xl">
+              ⚡
+            </div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h3 id="adr-modal-title" class="text-xl font-black tracking-tight text-white">Predictive ADR ML Engine</h3>
+                <span class="text-[10px] uppercase font-extrabold px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">PvPI / FAERS Calibrated</span>
+              </div>
+              <p class="text-xs text-slate-400">Machine learning adverse reaction risk scoring with SHAP clinical explainability</p>
+            </div>
+          </div>
+          <button id="closeAdrModalBtn" class="p-2 rounded-xl text-slate-400 hover:text-white bg-slate-800/60 hover:bg-slate-800 transition" aria-label="Close modal">✕</button>
+        </div>
+
+        <!-- Interactive Form -->
+        <div class="space-y-4 text-sm">
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Patient Age</label>
+              <input type="number" id="adrAge" min="1" max="110" value="65" class="w-full px-3 py-2 rounded-xl bg-slate-800/90 border border-slate-700 text-white font-bold focus:border-purple-500 focus:outline-none" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Gender</label>
+              <select id="adrGender" class="w-full px-3 py-2 rounded-xl bg-slate-800/90 border border-slate-700 text-white font-bold focus:border-purple-500 focus:outline-none">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">Renal eGFR Status</label>
+              <select id="adrRenal" class="w-full px-3 py-2 rounded-xl bg-slate-800/90 border border-slate-700 text-white font-bold focus:border-purple-500 focus:outline-none">
+                <option value="0">Normal (eGFR &gt; 60)</option>
+                <option value="1">Mild/Mod (eGFR 30–59)</option>
+                <option value="2">Severe (eGFR &lt; 30)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Comorbidities -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">Comorbidities & Risk Factors</label>
+            <div class="flex flex-wrap gap-2 text-xs">
+              <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 cursor-pointer select-none has-[:checked]:bg-purple-900/50 has-[:checked]:border-purple-500">
+                <input type="checkbox" id="adrCondHtn" class="rounded text-purple-600 focus:ring-0" checked />
+                <span>Hypertension (High BP)</span>
+              </label>
+              <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 cursor-pointer select-none has-[:checked]:bg-purple-900/50 has-[:checked]:border-purple-500">
+                <input type="checkbox" id="adrCondDm" class="rounded text-purple-600 focus:ring-0" checked />
+                <span>Type 2 Diabetes</span>
+              </label>
+              <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 cursor-pointer select-none has-[:checked]:bg-purple-900/50 has-[:checked]:border-purple-500">
+                <input type="checkbox" id="adrCondUlcer" class="rounded text-purple-600 focus:ring-0" />
+                <span>Peptic Ulcer / Acid</span>
+              </label>
+              <label class="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 cursor-pointer select-none has-[:checked]:bg-purple-900/50 has-[:checked]:border-purple-500">
+                <input type="checkbox" id="adrCondCvd" class="rounded text-purple-600 focus:ring-0" />
+                <span>Cardiovascular Disease</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Active Regimen (Allopathy + Ayurveda) -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">Active Prescription & Over-the-Counter Regimen</label>
+            <div class="flex flex-wrap gap-1.5 text-xs" id="adrDrugChips">
+              <button type="button" data-med="Combiflam" class="adr-chip px-2.5 py-1 rounded-lg border border-slate-700 bg-purple-950/60 border-purple-500 text-purple-200 font-semibold">Combiflam (NSAID)</button>
+              <button type="button" data-med="Telma 40" class="adr-chip px-2.5 py-1 rounded-lg border border-slate-700 bg-purple-950/60 border-purple-500 text-purple-200 font-semibold">Telma 40 (ARB)</button>
+              <button type="button" data-med="Glycomet 500" class="adr-chip px-2.5 py-1 rounded-lg border border-slate-700 bg-purple-950/60 border-purple-500 text-purple-200 font-semibold">Glycomet (Metformin)</button>
+              <button type="button" data-med="Ecosprin 75" class="adr-chip px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-semibold">Ecosprin (Aspirin)</button>
+              <button type="button" data-med="Pan-D" class="adr-chip px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-semibold">Pan-D (Pantoprazole+Dom)</button>
+              <button type="button" data-med="Atorva" class="adr-chip px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-semibold">Atorva (Statin)</button>
+              <button type="button" data-med="Alprazolam" class="adr-chip px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-semibold">Alprazolam (Sedative)</button>
+            </div>
+          </div>
+
+          <!-- Concurrent Ayurvedic Herbs -->
+          <div>
+            <label class="block text-xs font-bold text-slate-300 mb-1.5">Concurrent Ayurvedic Formulations</label>
+            <div class="flex flex-wrap gap-1.5 text-xs" id="adrHerbChips">
+              <button type="button" data-herb="Ashwagandha" class="adr-herb-chip px-2.5 py-1 rounded-lg border border-slate-700 bg-emerald-950/50 border-emerald-500 text-emerald-200 font-semibold">🌿 Ashwagandha</button>
+              <button type="button" data-herb="Giloy" class="adr-herb-chip px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-semibold">🌿 Giloy / Guduchi</button>
+              <button type="button" data-herb="Guggulu" class="adr-herb-chip px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-semibold">🌿 Guggulu</button>
+              <button type="button" data-herb="Karela" class="adr-herb-chip px-2.5 py-1 rounded-lg border border-slate-700 bg-slate-800 text-slate-300 font-semibold">🌿 Karela Extract</button>
+            </div>
+          </div>
+
+          <!-- Compute Button -->
+          <button id="runAdrCalculationBtn" type="button" class="w-full py-3 px-4 rounded-xl text-center font-extrabold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white shadow-lg transition flex items-center justify-center gap-2">
+            <span>⚡ Compute Machine Learning ADR Risk &amp; SHAP Drivers</span>
+          </button>
+        </div>
+
+        <!-- Live Prediction Output Screen -->
+        <div id="adrResultsContainer" class="p-5 rounded-2xl bg-slate-950 border border-slate-800 space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/80 pb-4">
+            <div>
+              <div class="text-xs uppercase font-bold tracking-wider text-slate-400">Estimated ADR Probability</div>
+              <div class="flex items-baseline gap-3">
+                <span id="adrScoreDisplay" class="text-4xl font-black text-red-400">86%</span>
+                <span id="adrBadgeDisplay" class="px-2.5 py-1 rounded-full text-xs font-black bg-red-950/80 text-red-300 border border-red-800/60">HIGH HAZARD</span>
+              </div>
+            </div>
+            <div class="sm:text-right">
+              <div class="text-xs uppercase font-bold tracking-wider text-slate-400">Primary Organ Hazard</div>
+              <div id="adrTopHazardDisplay" class="text-base font-bold text-amber-300 flex items-center sm:justify-end gap-1.5">
+                <span>💧 Acute Kidney Injury (97%)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Multi-Hazard Organ Breakdown -->
+          <div class="space-y-2">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Organ-System Hazard Projections</div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs" id="adrOrganHazardsList">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- SHAP Feature Contributions -->
+          <div class="space-y-2">
+            <div class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center justify-between">
+              <span>SHAP Feature Attribution (Why the model scored this)</span>
+              <span class="text-[10px] text-purple-400 font-mono">Local Interpretability</span>
+            </div>
+            <div id="adrShapList" class="space-y-1.5 text-xs font-mono">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <!-- Recommendations -->
+          <div class="p-3.5 rounded-xl bg-purple-950/30 border border-purple-800/40 text-xs space-y-1.5">
+            <div class="font-extrabold text-purple-300 flex items-center gap-1.5">
+              <span>🛡️ Actionable Clinical Recommendations</span>
+            </div>
+            <ul id="adrRecommendationsList" class="list-disc pl-4 space-y-1 text-slate-300">
+              <!-- Rendered via JS -->
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-10 mt-auto">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-4">
+      <div class="flex items-center justify-center gap-2 text-xl font-bold text-slate-900 dark:text-white">
+        <span>💊</span>
+        <span>Smart Patient <span class="text-orange-500">India</span> 🇮🇳</span>
+      </div>
+      <p class="max-w-2xl mx-auto text-sm text-slate-500 dark:text-slate-400">
+        <strong>⚠️ Educational Disclaimer:</strong> Smart Patient India is an open health literacy and clinical safety platform designed to assist patients in understanding polypharmacy, Indian formulary prices, and herb-drug interactions. It is not a substitute for licensed medical judgment.
+      </p>
+      <div class="text-xs text-slate-400 dark:text-slate-500">
+        © 2026 Smart Patient India. PvPI &amp; Jan Aushadhi Integrated. 100% Client-Side on GitHub Pages.
+      </div>
+    </div>
+  </footer>
+
+  <!-- Intelligence Engine & Dataset Wire Scripts -->
+  <script src="smasp-engine.js"></script>
+  <script src="js/data/indianPharma.js"></script>
+  <script src="js/data/ayurvedaAllopathy.js"></script>
+  <script src="js/engine/adrPredictor.js"></script>
+  <script>
+    'use strict';
+
+    const root = typeof window !== 'undefined' ? window : globalThis;
+
+    // ── Global State ───────────────────────────────────────────────────────────
+    let medicinesData = [];
+    let engine = null;
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    const CABINET_KEY = 'smasp_saved_medicines';
+    const PROFILE_KEY = 'smasp_user_profile';
+    const THEME_KEY = 'smasp_theme';
+
+    // ── Helper: User Profile Management ────────────────────────────────────────
+    function getUserProfile() {
+      try {
+        const raw = localStorage.getItem(PROFILE_KEY);
+        if (raw) return JSON.parse(raw);
+      } catch (e) {}
+      return {
+        age: 35,
+        isPregnant: false,
+        isBreastfeeding: false,
+        conditions: [],
+        allergies: []
+      };
+    }
+
+    function saveUserProfile(profile) {
+      try {
+        localStorage.setItem(PROFILE_KEY, JSON.stringify(profile));
+      } catch (e) {}
+      updateProfileUI();
+      renderMedicineCards();
+      checkCabinetInteractions();
+    }
+
+    function updateProfileUI() {
+      const p = getUserProfile();
+      const parts = [];
+      if (p.age) parts.push(`Age ${p.age}`);
+      if (p.isPregnant) parts.push('Pregnant');
+      if (p.isBreastfeeding) parts.push('Nursing');
+      if (p.conditions && p.conditions.length) parts.push(`${p.conditions.length} condition(s)`);
+      if (p.allergies && p.allergies.length) parts.push(`${p.allergies.length} allergy`);
+
+      const text = parts.length ? parts.join(', ') : 'Standard Adult';
+      const summaryText = document.getElementById('profileSummaryText');
+      const bannerText = document.getElementById('activeProfileDetails');
+      if (summaryText) summaryText.textContent = `Profile: ${text}`;
+      if (bannerText) bannerText.textContent = text;
+    }
+
+    // ── Helper: Saved Medicines Cabinet Management ────────────────────────────
+    function getSavedMedicineIds() {
+      try {
+        return JSON.parse(localStorage.getItem(CABINET_KEY) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function toggleSavedMedicine(id) {
+      let saved = getSavedMedicineIds();
+      if (saved.includes(id)) {
+        saved = saved.filter(item => item !== id);
+      } else {
+        saved.push(id);
+      }
+      try {
+        localStorage.setItem(CABINET_KEY, JSON.stringify(saved));
+      } catch (e) {}
+      updateCabinetBadge();
+      renderCabinetList();
+      checkCabinetInteractions();
+      renderMedicineCards(); // Update card bookmark icons
+    }
+
+    function updateCabinetBadge() {
+      const saved = getSavedMedicineIds();
+      const badge = document.getElementById('cabinetCountBadge');
+      const drawerCount = document.getElementById('drawerItemCount');
+      if (badge) badge.textContent = saved.length;
+      if (drawerCount) drawerCount.textContent = saved.length;
+    }
+
+    // ── Helper: Polypharmacy Live Interaction Analysis ────────────────────────
+    function checkCabinetInteractions() {
+      const container = document.getElementById('interactionAnalysisBox');
+      if (!container || !engine) return;
+
+      const savedIds = getSavedMedicineIds();
+
+      if (savedIds.length < 2) {
+        container.className = 'p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-sm text-slate-500 dark:text-slate-400 space-y-1';
+        container.innerHTML = `
+          <div class="flex items-center gap-2 font-bold text-slate-700 dark:text-slate-300">
+            <span>🛡️ Polypharmacy Guard</span>
+          </div>
+          <p>Add 2 or more medicines to your cabinet to run a live drug-drug interaction and compounding side effect analysis.</p>
+        `;
+        return;
+      }
+
+      const warnings = engine.checkInteractions(savedIds);
+
+      if (warnings.length === 0) {
+        container.className = 'p-4 rounded-2xl bg-calm-safeBg border border-calm-safeBorder text-calm-safeText space-y-2';
+        container.innerHTML = `
+          <div class="flex items-center gap-2 font-bold text-base">
+            <span>✅ No Known Interactions Found</span>
+          </div>
+          <p class="text-sm">The ${savedIds.length} medicines in your cabinet have no direct clashes or high compounding side effects in our database.</p>
+        `;
+      } else {
+        const hasAvoid = warnings.some(w => w.level === 'avoid');
+        const boxBg = hasAvoid ? 'bg-calm-avoidBg border-calm-avoidBorder text-calm-avoidText' : 'bg-calm-cautionBg border-calm-cautionBorder text-calm-cautionText';
+
+        const warningsHtml = warnings.map(w => {
+          const icon = w.level === 'avoid' ? '🛑' : '⚠️';
+          return `
+            <div class="p-3 rounded-xl bg-white/70 dark:bg-slate-800/80 border border-current/20 space-y-1 text-sm">
+              <div class="font-extrabold flex items-center gap-1.5">
+                <span>${icon}</span>
+                <span>${w.title}</span>
+              </div>
+              <p class="text-xs opacity-90 leading-relaxed font-medium">${w.plainEnglishWhy}</p>
+            </div>
+          `;
+        }).join('');
+
+        container.className = `p-4 rounded-2xl border ${boxBg} space-y-3`;
+        container.innerHTML = `
+          <div class="flex items-center gap-2 font-extrabold text-base">
+            <span>⚠️ Safety Notice: ${warnings.length} Potential Interaction${warnings.length > 1 ? 's' : ''}</span>
+          </div>
+          <div class="space-y-2">
+            ${warningsHtml}
+          </div>
+        `;
+      }
+    }
+
+    function renderCabinetList() {
+      const listEl = document.getElementById('cabinetList');
+      if (!listEl) return;
+
+      const savedIds = getSavedMedicineIds();
+      if (!savedIds.length) {
+        listEl.innerHTML = `<div class="p-4 text-center text-sm text-slate-400">No medicines saved yet. Tap "Save" on any card to add it here.</div>`;
+        return;
+      }
+
+      const html = savedIds.map(id => {
+        const med = engine ? engine.drugMap.get(id) : null;
+        if (!med) return '';
+
+        return `
+          <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700">
+            <div>
+              <a href="medicine.html?id=${encodeURIComponent(med.id)}" class="font-bold text-slate-900 dark:text-white hover:text-brand-600 text-sm">${escapeHtml(med.genericName)}</a>
+              <div class="text-xs text-slate-400">${escapeHtml(med.category)}</div>
+            </div>
+            <button onclick="toggleSavedMedicine('${med.id}')" class="text-red-500 hover:text-red-700 p-1.5 text-xs font-bold" aria-label="Remove ${escapeHtml(med.genericName)} from cabinet">✕</button>
+          </div>
+        `;
+      }).join('');
+
+      listEl.innerHTML = html;
+    }
+
+    // ── Helper: Debounce ───────────────────────────────────────────────────────
+    function debounce(fn, wait = 100) {
+      let timer;
+      return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn.apply(this, args), wait);
+      };
+    }
+
+    function escapeHtml(str) {
+      if (typeof str !== 'string') return String(str || '');
+      return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+
+    // ── Render Medicine Cards ──────────────────────────────────────────────────
+    function renderMedicineCards() {
+      const grid = document.getElementById('medicineGrid');
+      const countBadge = document.getElementById('resultsCountBadge');
+      const heading = document.getElementById('resultsHeading');
+      const subheading = document.getElementById('resultsSubheading');
+      if (!grid) return;
+
+      const profile = getUserProfile();
+
+      // VIEW 1: Indian Pharmaceutical Catalog & Jan Aushadhi Generic Savings
+      if (currentCategory === 'indian-pharma') {
+        const catalog = (root.SMASP && root.SMASP.data && root.SMASP.data.indianPharma && root.SMASP.data.indianPharma.catalog) || [];
+        let filtered = catalog;
+
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase().trim();
+          filtered = catalog.filter(m =>
+            m.brandName.toLowerCase().includes(q) ||
+            m.genericName.toLowerCase().includes(q) ||
+            m.saltComposition.toLowerCase().includes(q) ||
+            m.manufacturer.toLowerCase().includes(q) ||
+            (m.tags && m.tags.some(t => t.toLowerCase().includes(q)))
+          );
+        }
+
+        if (countBadge) countBadge.textContent = `${filtered.length} Indian Brand${filtered.length === 1 ? '' : 's'}`;
+        if (heading) heading.textContent = searchQuery ? `Indian Pharma matches for "${searchQuery}"` : '🇮🇳 Top Indian Brands & Jan Aushadhi Savings';
+        if (subheading) subheading.textContent = 'Active ingredients, CDSCO regulatory schedules, and generic price differentials';
+
+        if (!filtered.length) {
+          grid.innerHTML = `
+            <div class="col-span-full p-12 text-center rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-3">
+              <span class="text-4xl">🇮🇳</span>
+              <h3 class="text-xl font-bold text-slate-900 dark:text-white">No Indian brands match your search</h3>
+              <p class="text-slate-500 dark:text-slate-400 text-sm max-w-md mx-auto">Try searching for "Dolo", "Glycomet", "Combiflam", "Pan-D", "Telma", or "Shelcal".</p>
+            </div>
+          `;
+          return;
+        }
+
+        grid.innerHTML = filtered.map(item => `
+          <article class="p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300 border border-orange-200 dark:border-orange-800">
+                  ${escapeHtml(item.cdscoSchedule)}
+                </span>
+                <span class="inline-flex items-center gap-1 text-xs font-black px-2.5 py-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-800">
+                  <span>💰 Save ${escapeHtml(item.savingsPercentage)}</span>
+                </span>
+              </div>
+
+              <div>
+                <h3 class="text-xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                  <span>${escapeHtml(item.brandName)}</span>
+                </h3>
+                <p class="text-xs text-slate-400 mt-0.5 font-medium">${escapeHtml(item.manufacturer)}</p>
+                <div class="mt-1 text-xs font-bold text-brand-600 dark:text-brand-400 bg-brand-50 dark:bg-brand-950/40 px-2 py-1 rounded-md inline-block">
+                  Active: ${escapeHtml(item.saltComposition)}
+                </div>
+              </div>
+
+              <!-- Jan Aushadhi Savings Card -->
+              <div class="p-3 rounded-2xl bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/60 space-y-1 text-xs">
+                <div class="font-extrabold text-emerald-800 dark:text-emerald-300 flex items-center gap-1">
+                  <span>🏢 Jan Aushadhi Generic Alternative:</span>
+                </div>
+                <div class="font-bold text-slate-800 dark:text-slate-200">${escapeHtml(item.janAushadhiEquivalent)}</div>
+                <div class="flex items-center justify-between pt-1 text-slate-600 dark:text-slate-400">
+                  <span>Branded: <del class="text-red-500 font-semibold">₹${item.approxBrandedPriceInr.toFixed(1)}</del></span>
+                  <span class="font-black text-emerald-700 dark:text-emerald-300 text-sm">Jan Aushadhi: ₹${item.approxJanAushadhiPriceInr.toFixed(1)}</span>
+                </div>
+              </div>
+
+              <p class="text-xs font-medium text-slate-600 dark:text-slate-300 leading-relaxed">
+                🇮🇳 <strong>हिन्दी जानकारी:</strong> ${escapeHtml(item.plainHindiSummary)}
+              </p>
+
+              <div class="p-2.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 text-[11px] text-amber-800 dark:text-amber-300 leading-relaxed font-semibold">
+                ⚠️ <strong>Safety Alert:</strong> ${escapeHtml(item.safetyWarning)}
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+              <button onclick="launchAdrWithDrug('${escapeHtml(item.brandName)}')" type="button" class="inline-flex items-center gap-1 text-xs font-extrabold px-3 py-2 rounded-xl bg-purple-50 dark:bg-purple-950/40 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800 hover:border-purple-500 transition">
+                <span>⚡ Check in ADR Model</span>
+              </button>
+            </div>
+          </article>
+        `).join('');
+        return;
+      }
+
+      // VIEW 2: Ayurveda–Allopathy Interaction Matrix (AHDI)
+      if (currentCategory === 'ayurveda') {
+        const interactions = (root.SMASP && root.SMASP.data && root.SMASP.data.ayurvedaAllopathy && root.SMASP.data.ayurvedaAllopathy.interactions) || [];
+        let filtered = interactions;
+
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase().trim();
+          filtered = interactions.filter(r =>
+            r.herb.toLowerCase().includes(q) ||
+            r.allopathyGroup.toLowerCase().includes(q) ||
+            r.title.toLowerCase().includes(q) ||
+            (r.allopathyExamples && r.allopathyExamples.some(ex => ex.toLowerCase().includes(q))) ||
+            (r.hindiWarning && r.hindiWarning.includes(q))
+          );
+        }
+
+        if (countBadge) countBadge.textContent = `${filtered.length} Interaction Rule${filtered.length === 1 ? '' : 's'}`;
+        if (heading) heading.textContent = searchQuery ? `Ayurveda interactions matching "${searchQuery}"` : '🌿 Ayurveda–Allopathy Interaction Matrix';
+        if (subheading) subheading.textContent = 'Evidence-based traditional herb + modern prescription risk screening';
+
+        grid.innerHTML = filtered.map(item => {
+          const isAvoid = item.severity === 'AVOID';
+          const badgeBg = isAvoid ? 'bg-red-50 text-red-700 dark:bg-red-950/60 dark:text-red-300 border-red-200 dark:border-red-800' : 'bg-amber-50 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-200 dark:border-amber-800';
+          const badgeIcon = isAvoid ? '🛑 AVOID' : '⚠️ CAUTION';
+
+          return `
+            <article class="p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+              <div class="space-y-3">
+                <div class="flex items-start justify-between gap-2">
+                  <span class="text-xs font-extrabold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+                    🌿 ${escapeHtml(item.herb)}
+                  </span>
+                  <span class="inline-flex items-center gap-1 text-xs font-black px-2.5 py-1 rounded-full border ${badgeBg}">
+                    ${badgeIcon}
+                  </span>
+                </div>
+
+                <div>
+                  <h3 class="text-lg font-black text-slate-900 dark:text-white">
+                    ${escapeHtml(item.title)}
+                  </h3>
+                  <p class="text-xs text-brand-600 dark:text-brand-400 font-bold mt-0.5">
+                    Clashes with: ${escapeHtml(item.allopathyGroup)} (${escapeHtml((item.allopathyExamples || []).slice(0, 4).join(', '))})
+                  </p>
+                </div>
+
+                <div class="space-y-1.5 text-xs text-slate-600 dark:text-slate-300">
+                  <p><strong>🔬 Mechanism:</strong> ${escapeHtml(item.mechanism)}</p>
+                  <p><strong>🚨 Clinical Risk:</strong> ${escapeHtml(item.clinicalRisk)}</p>
+                </div>
+
+                <div class="p-3 rounded-2xl bg-orange-50/80 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-900/60 text-xs font-medium text-orange-900 dark:text-orange-200 leading-relaxed">
+                  🇮🇳 <strong>हिन्दी चेतावनी:</strong> ${escapeHtml(item.hindiWarning)}
+                </div>
+              </div>
+
+              <div class="pt-3 border-t border-slate-100 dark:border-slate-700">
+                <p class="text-[11px] text-slate-400 font-semibold">💡 <strong>Advice:</strong> ${escapeHtml(item.recommendation)}</p>
+              </div>
+            </article>
+          `;
+        }).join('');
+        return;
+      }
+
+      // VIEW 3: Standard Formulations Catalog
+      if (!engine) return;
+      let filtered = medicinesData;
+
+      if (currentCategory !== 'all') {
+        filtered = filtered.filter(m => m.category === currentCategory);
+      }
+
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase().trim();
+        filtered = filtered.filter(m => {
+          const name = (m.genericName || '').toLowerCase();
+          const brands = (m.brandNames || []).join(' ').toLowerCase();
+          const uses = (m.commonUses || []).join(' ').toLowerCase();
+          const summary = (m.plainEnglishSummary || '').toLowerCase();
+          return name.includes(q) || brands.includes(q) || uses.includes(q) || summary.includes(q);
+        });
+      }
+
+      if (countBadge) countBadge.textContent = `${filtered.length} medicine${filtered.length === 1 ? '' : 's'}`;
+      if (heading) {
+        if (searchQuery) heading.textContent = `Search results for "${searchQuery}"`;
+        else if (currentCategory !== 'all') heading.textContent = `${currentCategory}`;
+        else heading.textContent = 'All Available Medicines';
+      }
+      if (subheading) {
+        subheading.textContent = `Scored dynamically for ${profile.age || 35}y profile`;
+      }
+
+      if (!filtered.length) {
+        grid.innerHTML = `
+          <div class="col-span-full p-12 text-center rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 space-y-3">
+            <span class="text-4xl">🔍</span>
+            <h3 class="text-xl font-bold text-slate-900 dark:text-white">No medicines match your search</h3>
+            <p class="text-slate-500 dark:text-slate-400 text-sm max-w-md mx-auto">Try searching for a different symptom (e.g. "headache", "fever") or brand name (e.g. "Advil", "Crocin").</p>
+          </div>
+        `;
+        return;
+      }
+
+      const savedIds = getSavedMedicineIds();
+
+      const html = filtered.map(med => {
+        const personalRisk = engine.calculatePersonalRisk(med.id, profile);
+        const isSaved = savedIds.includes(med.id);
+
+        let badgeBg = 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
+        let badgeIcon = '🟢';
+        let badgeText = 'Safe for You';
+
+        if (personalRisk.level === 'avoid') {
+          badgeBg = 'bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 border-red-200 dark:border-red-800';
+          badgeIcon = '🔴';
+          badgeText = 'Avoid';
+        } else if (personalRisk.level === 'caution') {
+          badgeBg = 'bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 border-amber-200 dark:border-amber-800';
+          badgeIcon = '🟡';
+          badgeText = 'Caution Note';
+        }
+
+        const brandsSnippet = (med.brandNames || []).slice(0, 3).join(', ');
+
+        return `
+          <article class="p-6 rounded-3xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4">
+            <div class="space-y-3">
+              <div class="flex items-start justify-between gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300">
+                  ${escapeHtml(med.category)}
+                </span>
+                <span class="inline-flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full border ${badgeBg}" title="${escapeHtml(personalRisk.plainEnglishWhy)}">
+                  <span>${badgeIcon}</span>
+                  <span>${badgeText}</span>
+                </span>
+              </div>
+
+              <div>
+                <a href="medicine.html?id=${encodeURIComponent(med.id)}" class="text-xl font-bold text-slate-900 dark:text-white hover:text-brand-600 transition block">
+                  ${escapeHtml(med.genericName)}
+                </a>
+                ${brandsSnippet ? `<p class="text-xs text-slate-400 mt-0.5">Common brands: ${escapeHtml(brandsSnippet)}</p>` : ''}
+              </div>
+
+              <p class="text-sm text-slate-600 dark:text-slate-300 line-clamp-3 leading-relaxed">
+                ${escapeHtml(med.plainEnglishSummary)}
+              </p>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 dark:border-slate-700 flex items-center justify-between">
+              <button onclick="toggleSavedMedicine('${med.id}')" type="button" class="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-2 rounded-xl border transition ${isSaved ? 'bg-brand-50 dark:bg-brand-900/40 text-brand-700 dark:text-brand-300 border-brand-300 dark:border-brand-700' : 'bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-brand-500'}">
+                <span>${isSaved ? '⭐ In Cabinet' : '+ Save'}</span>
+              </button>
+
+              <a href="medicine.html?id=${encodeURIComponent(med.id)}" class="inline-flex items-center gap-1 text-sm font-bold text-brand-600 dark:text-brand-400 hover:text-brand-700 transition">
+                <span>Learn More</span>
+                <span>→</span>
+              </a>
+            </div>
+          </article>
+        `;
+      }).join('');
+
+      grid.innerHTML = html;
+    }
+
+    // ── Dark Mode Initializer ──────────────────────────────────────────────────
+    function initTheme() {
+      const darkToggle = document.getElementById('darkToggle');
+      function applyMode(isDark) {
+        document.documentElement.classList.toggle('dark', isDark);
+        if (darkToggle) darkToggle.textContent = isDark ? '☀️' : '🌙';
+        try { localStorage.setItem(THEME_KEY, isDark ? 'dark' : 'light'); } catch (e) {}
+      }
+
+      let saved = null;
+      try { saved = localStorage.getItem(THEME_KEY); } catch (e) {}
+      const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      applyMode(saved !== null ? saved === 'dark' : prefersDark);
+
+      if (darkToggle) {
+        darkToggle.addEventListener('click', () => {
+          const isDark = document.documentElement.classList.contains('dark');
+          applyMode(!isDark);
+        });
+      }
+    }
+
+    // ── Launch ADR Predictor with Specific Drug ────────────────────────────────
+    function launchAdrWithDrug(drugName) {
+      openAdrModal();
+      // Ensure drug chip is active if matching
+      document.querySelectorAll('.adr-chip').forEach(btn => {
+        if (btn.dataset.med && btn.dataset.med.toLowerCase() === drugName.toLowerCase()) {
+          btn.classList.add('bg-purple-950/60', 'border-purple-500', 'text-purple-200');
+          btn.classList.remove('bg-slate-800', 'text-slate-300');
+        }
+      });
+      runAdrPrediction();
+    }
+    window.launchAdrWithDrug = launchAdrWithDrug;
+
+    // ── ADR ML Predictor Modal Controller ──────────────────────────────────────
+    function openAdrModal() {
+      const modal = document.getElementById('adrModal');
+      if (modal) modal.classList.remove('hidden');
+      runAdrPrediction();
+    }
+
+    function closeAdrModal() {
+      const modal = document.getElementById('adrModal');
+      if (modal) modal.classList.add('hidden');
+    }
+
+    function runAdrPrediction() {
+      if (!root.SMASP || !root.SMASP.engine || !root.SMASP.engine.adrPredictor) return;
+
+      const age = parseInt(document.getElementById('adrAge')?.value, 10) || 65;
+      const gender = document.getElementById('adrGender')?.value || 'male';
+      const renal = parseInt(document.getElementById('adrRenal')?.value, 10) || 0;
+
+      const conditions = [];
+      if (document.getElementById('adrCondHtn')?.checked) conditions.push('Hypertension');
+      if (document.getElementById('adrCondDm')?.checked) conditions.push('Type 2 Diabetes');
+      if (document.getElementById('adrCondUlcer')?.checked) conditions.push('Peptic Ulcer');
+      if (document.getElementById('adrCondCvd')?.checked) conditions.push('Cardiovascular Disease');
+      if (renal > 0) conditions.push('Chronic Kidney Disease');
+
+      const selectedMeds = [];
+      document.querySelectorAll('.adr-chip.border-purple-500').forEach(b => {
+        if (b.dataset.med) selectedMeds.push(b.dataset.med);
+      });
+
+      const selectedHerbs = [];
+      document.querySelectorAll('.adr-herb-chip.border-emerald-500').forEach(b => {
+        if (b.dataset.herb) selectedHerbs.push(b.dataset.herb);
+      });
+
+      const profile = {
+        age,
+        gender,
+        renalImpairment: renal,
+        conditions,
+        medicines: selectedMeds,
+        ayurvedaHerbs: selectedHerbs
+      };
+
+      const result = root.SMASP.engine.adrPredictor.predictAdverseReactionRisk(profile);
+
+      // Render Display Values
+      const scoreDisp = document.getElementById('adrScoreDisplay');
+      const badgeDisp = document.getElementById('adrBadgeDisplay');
+      const topHazDisp = document.getElementById('adrTopHazardDisplay');
+
+      if (scoreDisp) scoreDisp.textContent = `${result.riskScorePercentage}%`;
+      if (badgeDisp) {
+        badgeDisp.textContent = `${result.riskCategory} HAZARD`;
+        if (result.riskCategory === 'HIGH') {
+          badgeDisp.className = 'px-2.5 py-1 rounded-full text-xs font-black bg-red-950/80 text-red-300 border border-red-800/60';
+          if (scoreDisp) scoreDisp.className = 'text-4xl font-black text-red-400';
+        } else if (result.riskCategory === 'MODERATE') {
+          badgeDisp.className = 'px-2.5 py-1 rounded-full text-xs font-black bg-amber-950/80 text-amber-300 border border-amber-800/60';
+          if (scoreDisp) scoreDisp.className = 'text-4xl font-black text-amber-400';
+        } else {
+          badgeDisp.className = 'px-2.5 py-1 rounded-full text-xs font-black bg-emerald-950/80 text-emerald-300 border border-emerald-800/60';
+          if (scoreDisp) scoreDisp.className = 'text-4xl font-black text-emerald-400';
+        }
+      }
+
+      if (topHazDisp) {
+        topHazDisp.innerHTML = `<span>${result.topHazard.icon} ${result.topHazard.name} (${Math.round(result.topHazard.prob * 100)}%)</span>`;
+      }
+
+      // Organ hazards
+      const organHazList = document.getElementById('adrOrganHazardsList');
+      if (organHazList && result.organHazards) {
+        organHazList.innerHTML = Object.values(result.organHazards).map(h => {
+          const pct = Math.round(h.probability * 100);
+          const barColor = pct >= 60 ? 'bg-red-500' : pct >= 30 ? 'bg-amber-500' : 'bg-emerald-500';
+          return `
+            <div class="p-2.5 rounded-xl bg-slate-900 border border-slate-800 space-y-1">
+              <div class="flex items-center justify-between text-slate-300 font-bold">
+                <span class="truncate">${h.icon} ${h.name}</span>
+                <span class="font-mono text-purple-300">${pct}%</span>
+              </div>
+              <div class="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
+                <div class="${barColor} h-full transition-all duration-300" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // SHAP Explanations
+      const shapEl = document.getElementById('adrShapList');
+      if (shapEl && result.shapExplanations) {
+        shapEl.innerHTML = result.shapExplanations.map(s => {
+          const sign = s.impact > 0 ? `+${s.impact}` : `${s.impact}`;
+          const label = s.reason || s.feature;
+          return `
+            <div class="flex items-center justify-between p-2 rounded-lg bg-slate-900/80 border border-purple-900/30">
+              <span class="text-slate-300 text-[11px] truncate pr-2">🔹 ${escapeHtml(label)}</span>
+              <span class="font-mono font-bold text-xs ${s.impact > 0 ? 'text-purple-400' : 'text-emerald-400'} shrink-0">${sign}</span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      // Recommendations
+      const recEl = document.getElementById('adrRecommendationsList');
+      if (recEl && result.clinicalRecommendations) {
+        recEl.innerHTML = result.clinicalRecommendations.map(r => `
+          <li>${escapeHtml(r)}</li>
+        `).join('');
+      }
+    }
+
+    // ── Drawer & Modal Event Bindings ──────────────────────────────────────────
+    function initDrawersAndModals() {
+      const drawer = document.getElementById('cabinetDrawer');
+      const drawerBackdrop = document.getElementById('drawerBackdrop');
+      const drawerPanel = document.getElementById('drawerPanel');
+      const openCabinetBtn = document.getElementById('openCabinetBtn');
+      const closeCabinetBtn = document.getElementById('closeCabinetBtn');
+      const closeCabinetBtn2 = document.getElementById('closeCabinetBtn2');
+      const clearCabinetBtn = document.getElementById('clearCabinetBtn');
+
+      function openDrawer() {
+        if (!drawer) return;
+        renderCabinetList();
+        checkCabinetInteractions();
+        drawer.classList.remove('hidden');
+        setTimeout(() => {
+          drawerBackdrop.classList.remove('opacity-0');
+          drawerPanel.classList.remove('translate-x-full');
+        }, 10);
+      }
+
+      function closeDrawer() {
+        if (!drawer) return;
+        drawerBackdrop.classList.add('opacity-0');
+        drawerPanel.classList.add('translate-x-full');
+        setTimeout(() => {
+          drawer.classList.add('hidden');
+        }, 300);
+      }
+
+      if (openCabinetBtn) openCabinetBtn.addEventListener('click', openDrawer);
+      if (closeCabinetBtn) closeCabinetBtn.addEventListener('click', closeDrawer);
+      if (closeCabinetBtn2) closeCabinetBtn2.addEventListener('click', closeDrawer);
+      if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+      if (clearCabinetBtn) {
+        clearCabinetBtn.addEventListener('click', () => {
+          localStorage.removeItem(CABINET_KEY);
+          updateCabinetBadge();
+          renderCabinetList();
+          checkCabinetInteractions();
+          renderMedicineCards();
+        });
+      }
+
+      // ADR Modal Bindings
+      const openAdrBtn = document.getElementById('openAdrBtn');
+      const closeAdrModalBtn = document.getElementById('closeAdrModalBtn');
+      const adrModalBackdrop = document.getElementById('adrModalBackdrop');
+      const runAdrCalculationBtn = document.getElementById('runAdrCalculationBtn');
+
+      if (openAdrBtn) openAdrBtn.addEventListener('click', openAdrModal);
+      if (closeAdrModalBtn) closeAdrModalBtn.addEventListener('click', closeAdrModal);
+      if (adrModalBackdrop) adrModalBackdrop.addEventListener('click', closeAdrModal);
+      if (runAdrCalculationBtn) runAdrCalculationBtn.addEventListener('click', runAdrPrediction);
+
+      // Bind Drug & Herb Chip toggles inside ADR Modal
+      document.querySelectorAll('.adr-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isActive = btn.classList.contains('border-purple-500');
+          if (isActive) {
+            btn.classList.remove('bg-purple-950/60', 'border-purple-500', 'text-purple-200');
+            btn.classList.add('bg-slate-800', 'text-slate-300');
+          } else {
+            btn.classList.add('bg-purple-950/60', 'border-purple-500', 'text-purple-200');
+            btn.classList.remove('bg-slate-800', 'text-slate-300');
+          }
+          runAdrPrediction();
+        });
+      });
+
+      document.querySelectorAll('.adr-herb-chip').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const isActive = btn.classList.contains('border-emerald-500');
+          if (isActive) {
+            btn.classList.remove('bg-emerald-950/50', 'border-emerald-500', 'text-emerald-200');
+            btn.classList.add('bg-slate-800', 'text-slate-300');
+          } else {
+            btn.classList.add('bg-emerald-950/50', 'border-emerald-500', 'text-emerald-200');
+            btn.classList.remove('bg-slate-800', 'text-slate-300');
+          }
+          runAdrPrediction();
+        });
+      });
+
+      // Profile Modal
+      const modal = document.getElementById('profileModal');
+      const openProfileBtn = document.getElementById('openProfileBtn');
+      const editProfileQuickBtn = document.getElementById('editProfileQuickBtn');
+      const closeProfileModalBtn = document.getElementById('closeProfileModalBtn');
+      const modalBackdrop = document.getElementById('modalBackdrop');
+      const profileForm = document.getElementById('profileForm');
+
+      function openProfileModal() {
+        const p = getUserProfile();
+        document.getElementById('profileAge').value = p.age || 35;
+        document.getElementById('profilePregnant').checked = !!p.isPregnant;
+        document.getElementById('profileNursing').checked = !!p.isBreastfeeding;
+        document.getElementById('profileAllergies').value = (p.allergies || []).join(', ');
+
+        const conditions = p.conditions || [];
+        document.querySelectorAll('.condition-check').forEach(chk => {
+          chk.checked = conditions.includes(chk.value);
+        });
+
+        modal.classList.remove('hidden');
+      }
+
+      function closeProfileModal() {
+        modal.classList.add('hidden');
+      }
+
+      if (openProfileBtn) openProfileBtn.addEventListener('click', openProfileModal);
+      if (editProfileQuickBtn) editProfileQuickBtn.addEventListener('click', openProfileModal);
+      if (closeProfileModalBtn) closeProfileModalBtn.addEventListener('click', closeProfileModal);
+      if (modalBackdrop) modalBackdrop.addEventListener('click', closeProfileModal);
+
+      if (profileForm) {
+        profileForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const age = parseInt(document.getElementById('profileAge').value, 10) || 35;
+          const isPregnant = document.getElementById('profilePregnant').checked;
+          const isBreastfeeding = document.getElementById('profileNursing').checked;
+          const allergies = document.getElementById('profileAllergies').value
+            .split(',')
+            .map(s => s.trim().toLowerCase())
+            .filter(Boolean);
+
+          const selectedConditions = Array.from(document.querySelectorAll('.condition-check:checked')).map(c => c.value);
+
+          saveUserProfile({
+            age,
+            isPregnant,
+            isBreastfeeding,
+            conditions: selectedConditions,
+            allergies
+          });
+
+          closeProfileModal();
+        });
+      }
+    }
+
+    // ── Application Bootstrapper ───────────────────────────────────────────────
+    async function init() {
+      initTheme();
+      updateProfileUI();
+      updateCabinetBadge();
+      initDrawersAndModals();
+
+      try {
+        const res = await fetch('data/medicines.json');
+        medicinesData = await res.json();
+      } catch (err) {
+        console.error('Failed to load medicines.json:', err);
+      }
+
+      // Initialize SmaspEngine
+      if (typeof SmaspEngine !== 'undefined') {
+        engine = new SmaspEngine(medicinesData);
+      }
+
+      // Bind search input with 100ms debounce
+      const searchInput = document.getElementById('searchInput');
+      const clearSearchBtn = document.getElementById('clearSearchBtn');
+
+      if (searchInput) {
+        searchInput.addEventListener('input', debounce((e) => {
+          searchQuery = e.target.value;
+          if (clearSearchBtn) {
+            clearSearchBtn.classList.toggle('hidden', !searchQuery);
+          }
+          renderMedicineCards();
+        }, 100));
+
+        if (clearSearchBtn) {
+          clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            searchQuery = '';
+            clearSearchBtn.classList.add('hidden');
+            searchInput.focus();
+            renderMedicineCards();
+          });
+        }
+      }
+
+      // Bind category filter chips
+      document.querySelectorAll('.cat-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          document.querySelectorAll('.cat-chip').forEach(c => {
+            c.classList.remove('active', 'bg-brand-600', 'text-white');
+            c.classList.add('bg-white', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+            c.setAttribute('aria-selected', 'false');
+          });
+          chip.classList.add('active', 'bg-brand-600', 'text-white');
+          chip.classList.remove('bg-white', 'dark:bg-slate-800', 'text-slate-700', 'dark:text-slate-300');
+          chip.setAttribute('aria-selected', 'true');
+          currentCategory = chip.dataset.category || 'all';
+          renderMedicineCards();
+        });
+      });
+
+      renderMedicineCards();
+    }
+
+    window.toggleSavedMedicine = toggleSavedMedicine;
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>

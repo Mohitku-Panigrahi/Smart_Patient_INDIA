@@ -1,0 +1,603 @@
+{
+  "Paracetamol": {
+    "use": "Uses temporarily relieves minor aches and pains due to: headache the common cold backache minor pain of arthritis tootha",
+    "category": "Analgesic / Antipyretic",
+    "icon": "💊",
+    "mechanism": "Mechanism of action for Paracetamol (fetch from FDA label manually).",
+    "treats": "Uses temporarily relieves minor aches and pains due to: headache the common cold backache minor pain of arthritis toothache muscular aches premenstrual and menstrual cramps temporarily reduces fever",
+    "description": "",
+    "avoid": [],
+    "caution": [],
+    "side_effects": "See full FDA label for adverse reactions.",
+    "learn_more": "Warnings Liver warning: This product contains acetaminophen. Severe liver damage may occur if you take more than 4,000 mg of acetaminophen in 24 hours with other drugs containing acetaminophen 3 or mo",
+    "did_you_know": [
+      "Paracetamol is classified as a Analgesic / Antipyretic.",
+      "Always take Paracetamol as directed by your doctor or pharmacist."
+    ],
+    "who_cannot": [
+      "Patients with known hypersensitivity to Paracetamol"
+    ],
+    "dosage_forms": [
+      "Tablet",
+      "Capsule"
+    ],
+    "allergens": [
+      "Paracetamol"
+    ],
+    "age_caution": {
+      "child": "Consult a pediatric specialist for appropriate dosing.",
+      "elderly": "May require dose adjustment; monitor closely for side effects."
+    },
+    "pregnancy": "Consult a qualified healthcare professional before use during pregnancy.",
+    "breastfeeding": "Consult a qualified healthcare professional before use while breastfeeding.",
+    "sources": [
+      "FDA Drug Label — Paracetamol",
+      "OpenFDA.gov — Structured Product Labeling",
+      "DailyMed — National Library of Medicine"
+    ],
+    "confidence": "High",
+    "steps": [
+      {
+        "icon": "💊",
+        "label": "Taken",
+        "desc": "Administered as directed"
+      },
+      {
+        "icon": "🩸",
+        "label": "Absorbed",
+        "desc": "Enters the bloodstream"
+      },
+      {
+        "icon": "🧬",
+        "label": "Acts",
+        "desc": "Analgesic / Antipyretic effect initiated"
+      },
+      {
+        "icon": "✨",
+        "label": "Effect",
+        "desc": "Therapeutic outcome achieved"
+      }
+    ],
+    "_fda_raw": {
+      "indications_and_usage": "Uses temporarily relieves minor aches and pains due to: headache the common cold backache minor pain of arthritis toothache muscular aches premenstrual and menstrual cramps temporarily reduces fever",
+      "warnings": "Warnings Liver warning: This product contains acetaminophen. Severe liver damage may occur if you take more than 4,000 mg of acetaminophen in 24 hours with other drugs containing acetaminophen 3 or more alcoholic drinks every day while using this product Allergy alert: Acetaminophen may cause severe skin reactions. Symptoms may include: skin reddening blisters rash If a skin reaction occurs, stop use and seek medical help right away. Do not use if you are allergic to acetaminophen or any of the inactive ingredients in this product with any other drug containing acetaminophen (prescription or n",
+      "adverse_reactions": null,
+      "contraindications": null
+    }
+  },
+  "Ibuprofen": {
+    "use": "Uses temporarily relieves minor aches and pains due to: headache toothache backache menstrual cramps the common cold mus",
+    "category": "NSAID / Anti-inflammatory",
+    "icon": "🔵",
+    "mechanism": "Mechanism of action for Ibuprofen (fetch from FDA label manually).",
+    "treats": "Uses temporarily relieves minor aches and pains due to: headache toothache backache menstrual cramps the common cold muscular aches minor pain of arthritis temporarily reduces fever",
+    "description": "",
+    "avoid": [],
+    "caution": [],
+    "side_effects": "See full FDA label for adverse reactions.",
+    "learn_more": "Warnings Allergy alert: Ibuprofen may cause a severe allergic reaction, especially in people allergic to aspirin. Symptoms may include: rash facial swelling asthma (wheezing) hives skin reddening shoc",
+    "did_you_know": [
+      "Ibuprofen is classified as a NSAID / Anti-inflammatory.",
+      "Always take Ibuprofen as directed by your doctor or pharmacist."
+    ],
+    "who_cannot": [
+      "Patients with known hypersensitivity to Ibuprofen"
+    ],
+    "dosage_forms": [
+      "Tablet",
+      "Capsule"
+    ],
+    "allergens": [
+      "Ibuprofen"
+    ],
+    "age_caution": {
+      "child": "Consult a pediatric specialist for appropriate dosing.",
+      "elderly": "May require dose adjustment; monitor closely for side effects."
+    },
+    "pregnancy": "Consult a qualified healthcare professional before use during pregnancy.",
+    "breastfeeding": "Consult a qualified healthcare professional before use while breastfeeding.",
+    "sources": [
+      "FDA Drug Label — Ibuprofen",
+      "OpenFDA.gov — Structured Product Labeling",
+      "DailyMed — National Library of Medicine"
+    ],
+    "confidence": "High",
+    "steps": [
+      {
+        "icon": "🔵",
+        "label": "Taken",
+        "desc": "Administered as directed"
+      },
+      {
+        "icon": "🩸",
+        "label": "Absorbed",
+        "desc": "Enters the bloodstream"
+      },
+      {
+        "icon": "🧬",
+        "label": "Acts",
+        "desc": "NSAID / Anti-inflammatory effect initiated"
+      },
+      {
+        "icon": "✨",
+        "label": "Effect",
+        "desc": "Therapeutic outcome achieved"
+      }
+    ],
+    "_fda_raw": {
+      "indications_and_usage": "Uses temporarily relieves minor aches and pains due to: headache toothache backache menstrual cramps the common cold muscular aches minor pain of arthritis temporarily reduces fever",
+      "warnings": "Warnings Allergy alert: Ibuprofen may cause a severe allergic reaction, especially in people allergic to aspirin. Symptoms may include: rash facial swelling asthma (wheezing) hives skin reddening shock blisters If an allergic reaction occurs, stop use and seek medical help right away. Stomach bleeding warning: This product contains an NSAID, which may cause severe stomach bleeding. The chance is higher if you: take more or for a longer time than directed take a blood thinning (anticoagulant) or steroid drug have had stomach ulcers or bleeding problems have 3 or more alcoholic drinks every day ",
+      "adverse_reactions": null,
+      "contraindications": null
+    }
+  },
+  "Amoxicillin": {
+    "use": "1 INDICATIONS AND USAGE Amoxicillin and clavulanate potassium for oral suspension, 600 mg/42.9 mg per 5 mL is indicated ",
+    "category": "Antibiotic / Penicillin",
+    "icon": "💉",
+    "mechanism": "12 CLINICAL PHARMACOLOGY 12.1 Mechanism of Action Amoxicillin and clavulanate potassium for oral suspension, 600 mg/42.9 mg per 5 mL is an antibacterial drug [see Microbiology (12.4) ]. 12.3 Pharmacokinetics The pharmacokinetics of amoxicillin and clavulanate were determined in a study of 19 pediatr",
+    "treats": "1 INDICATIONS AND USAGE Amoxicillin and clavulanate potassium for oral suspension, 600 mg/42.9 mg per 5 mL is indicated for the treatment of pediatric patients aged 3 months to 12 years weighing less ",
+    "description": "11 DESCRIPTION Amoxicillin and clavulanate potassium for oral suspension, USP is an oral antibacterial combination consisting of the semisynthetic antibacterial amoxicillin and the beta-lactamase inhibitor, clavulanate potassium (the potassium salt of clavulanic acid). Amoxicillin is an analog of am",
+    "avoid": [],
+    "caution": [],
+    "side_effects": "6 ADVERSE REACTIONS The following clinically significant adverse reactions are described elsewhere in labeling: Anaphylactic reactions [see Warnings and Precautions (5.1) ] Severe ",
+    "learn_more": "17 PATIENT COUNSELING INFORMATION Administration Instructions Inform patients to take amoxicillin and clavulanate potassium for oral suspension, 600 mg/42.9 mg per 5 mL every 12 hours with a meal or s",
+    "did_you_know": [
+      "Amoxicillin is classified as a Antibiotic / Penicillin.",
+      "17 PATIENT COUNSELING INFORMATION Administration Instructions Inform patients to take amoxicillin and clavulanate potassium for oral suspension, 600 m"
+    ],
+    "who_cannot": [
+      "Patients with known hypersensitivity to Amoxicillin"
+    ],
+    "dosage_forms": [],
+    "allergens": [
+      "Amoxicillin"
+    ],
+    "age_caution": {
+      "child": "Consult a pediatric specialist for appropriate dosing.",
+      "elderly": "May require dose adjustment; monitor closely for side effects."
+    },
+    "pregnancy": "Consult a qualified healthcare professional before use during pregnancy.",
+    "breastfeeding": "Consult a qualified healthcare professional before use while breastfeeding.",
+    "sources": [
+      "FDA Drug Label — Amoxicillin",
+      "OpenFDA.gov — Structured Product Labeling",
+      "DailyMed — National Library of Medicine"
+    ],
+    "confidence": "High",
+    "steps": [
+      {
+        "icon": "💉",
+        "label": "Taken",
+        "desc": "Administered as directed"
+      },
+      {
+        "icon": "🩸",
+        "label": "Absorbed",
+        "desc": "Enters the bloodstream"
+      },
+      {
+        "icon": "🧬",
+        "label": "Acts",
+        "desc": "Antibiotic / Penicillin effect initiated"
+      },
+      {
+        "icon": "✨",
+        "label": "Effect",
+        "desc": "Therapeutic outcome achieved"
+      }
+    ],
+    "_fda_raw": {
+      "indications_and_usage": "1 INDICATIONS AND USAGE Amoxicillin and clavulanate potassium for oral suspension, 600 mg/42.9 mg per 5 mL is indicated for the treatment of pediatric patients aged 3 months to 12 years weighing less than or equal to 40 kg with: Recurrent or persistent acute otitis media due to S. pneumoniae (penicillin MICs less than or equal to 2 mcg/mL), H. influenzae (including beta-lactamase-producing strains), or M. catarrhalis (including beta-lactamase-producing strains) characterized by the following risk factors: Antibacterial drug exposure for acute otitis media within the preceding 3 months, and eit",
+      "warnings": "5 WARNINGS AND PRECAUTIONS Serious (including fatal) hypersensitivity reactions: Discontinue amoxicillin and clavulanate potassium for oral suspension, 600 mg/42.9 mg per 5 mL if a reaction occurs and institute appropriate therapy. ( 5.1 ) Severe cutaneous adverse reactions (SCAR): Monitor closely. Discontinue if rash progresses. ( 5.2 ) Drug-induced enterocolitis syndrome (DIES) has been reported with use of amoxicillin, a component of amoxicillin and clavulanate potassium for oral suspension, 600 mg/42.9 mg per 5 mL. If this occurs, discontinue amoxicillin and clavulanate potassium for oral ",
+      "adverse_reactions": "6 ADVERSE REACTIONS The following clinically significant adverse reactions are described elsewhere in labeling: Anaphylactic reactions [see Warnings and Precautions (5.1) ] Severe Cutaneous Adverse Reactions (SCAR) [see Warnings and Precautions (5.2) ] Drug-Induced Enterocolitis Syndrome (DIES) [see Warnings and Precautions (5.3) ] Hepatic Dysfunction [see Warnings and Precautions (5.4) ] Clostridioides difficile- Associated Diarrhea (CDAD) [see Warnings and Precautions (5.5) ] Skin Rash in Patients with Mononucleosis [see Warnings and Precautions (5.6) ] The most frequently reported adverse r",
+      "contraindications": "4 CONTRAINDICATIONS History of a serious hypersensitivity reaction (e.g., anaphylaxis or Stevens-Johnson syndrome) to amoxicillin and clavulanate potassium for oral suspension, 600 mg/42.9 mg per 5 mL or any other beta-lactams (e.g., penicillins or cephalosporins). ( 4.1 ) History of cholestatic jaundice/hepatic dysfunction associated with amoxicillin and clavulanate potassium for oral suspension, 600 mg/42.9 mg per 5 mL. ( 4.2 ) 4.1 Serious Hypersensitivity Reactions Amoxicillin and clavulanate potassium for oral suspension, 600 mg/42.9 mg per 5 mL is contraindicated in patients with a histor"
+    }
+  },
+  "Cetirizine": {
+    "use": "Uses temporarily relieves these symptoms due to hay fever or other upper respiratory allergies: runny nose sneezing itch",
+    "category": "Antihistamine",
+    "icon": "🍃",
+    "mechanism": "Mechanism of action for Cetirizine (fetch from FDA label manually).",
+    "treats": "Uses temporarily relieves these symptoms due to hay fever or other upper respiratory allergies: runny nose sneezing itchy, watery eyes itching of the nose or throat",
+    "description": "",
+    "avoid": [],
+    "caution": [],
+    "side_effects": "See full FDA label for adverse reactions.",
+    "learn_more": "Warnings Do not use if you have ever had an allergic reaction to this product or any of its ingredients, or to an antihistamine containing hydroxyzine Ask a doctor before use if you have liver or kidn",
+    "did_you_know": [
+      "Cetirizine is classified as a Antihistamine.",
+      "Always take Cetirizine as directed by your doctor or pharmacist."
+    ],
+    "who_cannot": [
+      "Patients with known hypersensitivity to Cetirizine"
+    ],
+    "dosage_forms": [
+      "Tablet",
+      "Capsule"
+    ],
+    "allergens": [
+      "Cetirizine"
+    ],
+    "age_caution": {
+      "child": "Consult a pediatric specialist for appropriate dosing.",
+      "elderly": "May require dose adjustment; monitor closely for side effects."
+    },
+    "pregnancy": "Consult a qualified healthcare professional before use during pregnancy.",
+    "breastfeeding": "Consult a qualified healthcare professional before use while breastfeeding.",
+    "sources": [
+      "FDA Drug Label — Cetirizine",
+      "OpenFDA.gov — Structured Product Labeling",
+      "DailyMed — National Library of Medicine"
+    ],
+    "confidence": "High",
+    "steps": [
+      {
+        "icon": "🍃",
+        "label": "Taken",
+        "desc": "Administered as directed"
+      },
+      {
+        "icon": "🩸",
+        "label": "Absorbed",
+        "desc": "Enters the bloodstream"
+      },
+      {
+        "icon": "🧬",
+        "label": "Acts",
+        "desc": "Antihistamine effect initiated"
+      },
+      {
+        "icon": "✨",
+        "label": "Effect",
+        "desc": "Therapeutic outcome achieved"
+      }
+    ],
+    "_fda_raw": {
+      "indications_and_usage": "Uses temporarily relieves these symptoms due to hay fever or other upper respiratory allergies: runny nose sneezing itchy, watery eyes itching of the nose or throat",
+      "warnings": "Warnings Do not use if you have ever had an allergic reaction to this product or any of its ingredients, or to an antihistamine containing hydroxyzine Ask a doctor before use if you have liver or kidney disease. Your doctor should determine if you need a different dose. Ask doctor or pharmacist before use if you are taking sedatives or tranquilizers When using this product drowsiness may occur avoid alcoholic drinks alcohol, sedatives, and tranquilizers may increase drowsiness be careful when drivinga motor vehicle or operating machinery Stop use and ask doctor if an allergic reaction to this ",
+      "adverse_reactions": null,
+      "contraindications": null
+    }
+  },
+  "Omeprazole": {
+    "use": "Use treats frequent heartburn (occurs 2 or more days a week) not intended for immediate relief of heartburn; this drug m",
+    "category": "Proton Pump Inhibitor (PPI)",
+    "icon": "🟤",
+    "mechanism": "Mechanism of action for Omeprazole (fetch from FDA label manually).",
+    "treats": "Use treats frequent heartburn (occurs 2 or more days a week) not intended for immediate relief of heartburn; this drug may take 1 to 4 days for full effect",
+    "description": "",
+    "avoid": [],
+    "caution": [],
+    "side_effects": "See full FDA label for adverse reactions.",
+    "learn_more": "Warnings Allergy alert: Do not use if you are allergic to omeprazole Do not use if you have trouble or pain swallowing food, vomiting with blood, or bloody or black stools. These may be signs of a ser",
+    "did_you_know": [
+      "Omeprazole is classified as a Proton Pump Inhibitor (PPI).",
+      "Always take Omeprazole as directed by your doctor or pharmacist."
+    ],
+    "who_cannot": [
+      "Patients with known hypersensitivity to Omeprazole"
+    ],
+    "dosage_forms": [
+      "Tablet",
+      "Capsule"
+    ],
+    "allergens": [
+      "Omeprazole"
+    ],
+    "age_caution": {
+      "child": "Consult a pediatric specialist for appropriate dosing.",
+      "elderly": "May require dose adjustment; monitor closely for side effects."
+    },
+    "pregnancy": "Consult a qualified healthcare professional before use during pregnancy.",
+    "breastfeeding": "Consult a qualified healthcare professional before use while breastfeeding.",
+    "sources": [
+      "FDA Drug Label — Omeprazole",
+      "OpenFDA.gov — Structured Product Labeling",
+      "DailyMed — National Library of Medicine"
+    ],
+    "confidence": "High",
+    "steps": [
+      {
+        "icon": "🟤",
+        "label": "Taken",
+        "desc": "Administered as directed"
+      },
+      {
+        "icon": "🩸",
+        "label": "Absorbed",
+        "desc": "Enters the bloodstream"
+      },
+      {
+        "icon": "🧬",
+        "label": "Acts",
+        "desc": "Proton Pump Inhibitor (PPI) effect initiated"
+      },
+      {
+        "icon": "✨",
+        "label": "Effect",
+        "desc": "Therapeutic outcome achieved"
+      }
+    ],
+    "_fda_raw": {
+      "indications_and_usage": "Use treats frequent heartburn (occurs 2 or more days a week) not intended for immediate relief of heartburn; this drug may take 1 to 4 days for full effect",
+      "warnings": "Warnings Allergy alert: Do not use if you are allergic to omeprazole Do not use if you have trouble or pain swallowing food, vomiting with blood, or bloody or black stools. These may be signs of a serious condition. See your doctor. Ask a doctor before use if you have had heartburn over 3 months. This may be a sign of a more serious condition. heartburn with lightheadedness, sweating or dizziness chest pain or shoulder pain with shortness of breath; sweating; pain spreading to arms, neck or shoulders; or lightheadedness frequent chest pain frequent wheezing, particularly with heartburn unexpla",
+      "adverse_reactions": null,
+      "contraindications": null
+    }
+  },
+  "Metformin": {
+    "use": "1 INDICATIONS AND USAGE ZITUVIMET is a combination of sitagliptin, a dipeptidyl peptidase-4 (DPP-4) inhibitor, and metfo",
+    "category": "Antidiabetic / Biguanide",
+    "icon": "💙",
+    "mechanism": "12.1 Mechanism of Action ZITUVIMET ZITUVIMET combines two antihyperglycemic agents with complementary mechanisms of action to improve glycemic control in patients with type 2 diabetes mellitus: sitagliptin, a DPP- 4 inhibitor, and metformin HCl, a member of the biguanide class. Sitagliptin Sitaglipt",
+    "treats": "1 INDICATIONS AND USAGE ZITUVIMET is a combination of sitagliptin, a dipeptidyl peptidase-4 (DPP-4) inhibitor, and metformin hydrochloride (HCl), a biguanide, indicated as an adjunct to diet and exerc",
+    "description": "11 DESCRIPTION ZITUVIMET (sitagliptin and metformin HCl) tablets for oral use contain sitagliptin and metformin HCl. Sitagliptin Sitagliptin is an orally-active inhibitor of DPP-4 enzyme. Sitagliptin is present in ZITUVIMET tablets in the form of sitagliptin free base. Sitagliptin free base is descr",
+    "avoid": [],
+    "caution": [],
+    "side_effects": "6 ADVERSE REACTIONS The following adverse reactions are also discussed elsewhere in the prescribing information: Lactic Acidosis [see Warnings and Precautions ( 5.1 )] Pancreatitis",
+    "learn_more": "17 PATIENT COUNSELING INFORMATION Advise the patient to read the FDA-approved patient labeling (Medication Guide). Lactic Acidosis Explain the risks of lactic acidosis, its symptoms, and conditions th",
+    "did_you_know": [
+      "Metformin is classified as a Antidiabetic / Biguanide.",
+      "17 PATIENT COUNSELING INFORMATION Advise the patient to read the FDA-approved patient labeling (Medication Guide). Lactic Acidosis Explain the risks o"
+    ],
+    "who_cannot": [
+      "Patients with known hypersensitivity to Metformin"
+    ],
+    "dosage_forms": [
+      "oval shaped",
+      "biconvex",
+      "000 mg tablets are reddish brown",
+      "oval shaped",
+      "biconvex"
+    ],
+    "allergens": [
+      "Metformin"
+    ],
+    "age_caution": {
+      "child": "Consult a pediatric specialist for appropriate dosing.",
+      "elderly": "May require dose adjustment; monitor closely for side effects."
+    },
+    "pregnancy": "Consult a qualified healthcare professional before use during pregnancy.",
+    "breastfeeding": "Consult a qualified healthcare professional before use while breastfeeding.",
+    "sources": [
+      "FDA Drug Label — Metformin",
+      "OpenFDA.gov — Structured Product Labeling",
+      "DailyMed — National Library of Medicine"
+    ],
+    "confidence": "High",
+    "steps": [
+      {
+        "icon": "💙",
+        "label": "Taken",
+        "desc": "Administered as directed"
+      },
+      {
+        "icon": "🩸",
+        "label": "Absorbed",
+        "desc": "Enters the bloodstream"
+      },
+      {
+        "icon": "🧬",
+        "label": "Acts",
+        "desc": "Antidiabetic / Biguanide effect initiated"
+      },
+      {
+        "icon": "✨",
+        "label": "Effect",
+        "desc": "Therapeutic outcome achieved"
+      }
+    ],
+    "_fda_raw": {
+      "indications_and_usage": "1 INDICATIONS AND USAGE ZITUVIMET is a combination of sitagliptin, a dipeptidyl peptidase-4 (DPP-4) inhibitor, and metformin hydrochloride (HCl), a biguanide, indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus. ( 1 ) Limitations of Use: ZITUVIMET is not recommended in patients with type 1 diabetes mellitus. ( 1 ) ZITUVIMET has not been studied in patients with a history of pancreatitis. ( 1 ) ZITUVIMET is indicated as an adjunct to diet and exercise to improve glycemic control in adults with type 2 diabetes mellitus. Limitations of ",
+      "warnings": "WARNING: LACTIC ACIDOSIS WARNING: LACTIC ACIDOSIS See full prescribing information for complete boxed warning . Postmarketing cases of metformin-associated lactic acidosis have resulted in death, hypothermia, hypotension, and resistant bradyarrhythmias. Symptoms included malaise, myalgias, respiratory distress, somnolence, and abdominal pain. Laboratory abnormalities included elevated blood lactate levels, anion gap acidosis, increased lactate/pyruvate ratio, and metformin plasma levels generally >5 mcg/mL. ( 5.1 ) Risk factors include renal impairment, concomitant use of certain drugs, age ≥6",
+      "adverse_reactions": "6 ADVERSE REACTIONS The following adverse reactions are also discussed elsewhere in the prescribing information: Lactic Acidosis [see Warnings and Precautions ( 5.1 )] Pancreatitis [see Warnings and Precautions ( 5.2 )] Heart Failure [see Warnings and Precautions ( 5.3 )] Acute Renal Failure [see Warnings and Precautions ( 5.4 )] Vitamin B12 Deficiency [see Warnings and Precautions ( 5.5 )] Hypoglycemia with Concomitant Use with Insulin or Insulin Secretagogues [see Warnings and Precautions ( 5.6 )] Hypersensitivity Reactions [see Warnings and Precautions ( 5.7 )] Severe and Disabling Arthralg",
+      "contraindications": "4 CONTRAINDICATIONS Severe renal impairment: (eGFR below 30 mL/min/1.73 m 2 ) ( 4) Metabolic acidosis, including diabetic ketoacidosis. ( 4 ) History of a serious hypersensitivity reaction to ZITUVIMET, sitagliptin, or metformin, such as anaphylaxis or angioedema. (4) ZITUVIMET is contraindicated in patients with: Severe renal impairment (eGFR below 30 mL/min/1.73 m 2 ) [see Warnings and Precautions ( 5.1 )]. Acute or chronic metabolic acidosis, including diabetic ketoacidosis. History of a serious hypersensitivity reaction to sitagliptin, metformin, or any of the excipients in ZITUVIMET. Seri"
+    }
+  },
+  "Atorvastatin": {
+    "use": "1 INDICATIONS AND USAGE Atorvastatin calcium tablets are indicated: To reduce the risk of: Myocardial infarction (MI), s",
+    "category": "Statin / Lipid-Lowering",
+    "icon": "❤️",
+    "mechanism": "12.1 Mechanism of Action Atorvastatin is a selective, competitive inhibitor of HMG-CoA reductase, the rate-limiting enzyme that converts 3-hydroxy-3-­methylglutaryl-coenzyme A to mevalonate, a precursor of sterols, including cholesterol. In animal models, atorvastatin calcium lowers plasma cholester",
+    "treats": "1 INDICATIONS AND USAGE Atorvastatin calcium tablets are indicated: To reduce the risk of: Myocardial infarction (MI), stroke, revascularization procedures, and angina in adults with multiple risk fac",
+    "description": "11 DESCRIPTION Atorvastatin is an inhibitor of 3-hydroxy-3-methylglutaryl-coenzyme A (HMG-CoA) reductase. Atorvastatin calcium USP is (βR, δR)-2-(p-fluorophenyl)-β,δ-dihydroxy-5-isopropyl-3-phenyl-4(phenylcarbamoyl)pyrrole-l-heptanaote (1:2), trihydrate. The molecular formula of atorvastatin calcium",
+    "avoid": [],
+    "caution": [],
+    "side_effects": "6 ADVERSE REACTIONS The following important adverse reactions are described below and elsewhere in the labeling: Myopathy and Rhabdomyolysis [see Warnings and Precautions (5.1) ] I",
+    "learn_more": "17 PATIENT COUNSELING INFORMATION Advise the patient to read the FDA-approved patient labeling (Patient Information). Myopathy and Rhabdomyolysis Advise patients that atorvastatin calcium may cause my",
+    "did_you_know": [
+      "Atorvastatin is classified as a Statin / Lipid-Lowering.",
+      "17 PATIENT COUNSELING INFORMATION Advise the patient to read the FDA-approved patient labeling (Patient Information). Myopathy and Rhabdomyolysis Advi"
+    ],
+    "who_cannot": [
+      "Patients with known hypersensitivity to Atorvastatin"
+    ],
+    "dosage_forms": [
+      "oval shaped",
+      "biconvex",
+      "oval shaped",
+      "biconvex",
+      "oval shaped"
+    ],
+    "allergens": [
+      "Atorvastatin"
+    ],
+    "age_caution": {
+      "child": "Consult a pediatric specialist for appropriate dosing.",
+      "elderly": "May require dose adjustment; monitor closely for side effects."
+    },
+    "pregnancy": "Consult a qualified healthcare professional before use during pregnancy.",
+    "breastfeeding": "Consult a qualified healthcare professional before use while breastfeeding.",
+    "sources": [
+      "FDA Drug Label — Atorvastatin",
+      "OpenFDA.gov — Structured Product Labeling",
+      "DailyMed — National Library of Medicine"
+    ],
+    "confidence": "High",
+    "steps": [
+      {
+        "icon": "❤️",
+        "label": "Taken",
+        "desc": "Administered as directed"
+      },
+      {
+        "icon": "🩸",
+        "label": "Absorbed",
+        "desc": "Enters the bloodstream"
+      },
+      {
+        "icon": "🧬",
+        "label": "Acts",
+        "desc": "Statin / Lipid-Lowering effect initiated"
+      },
+      {
+        "icon": "✨",
+        "label": "Effect",
+        "desc": "Therapeutic outcome achieved"
+      }
+    ],
+    "_fda_raw": {
+      "indications_and_usage": "1 INDICATIONS AND USAGE Atorvastatin calcium tablets are indicated: To reduce the risk of: Myocardial infarction (MI), stroke, revascularization procedures, and angina in adults with multiple risk factors for coronary heart disease (CHD) but without clinically evident CHD MI and stroke in adults with type 2 diabetes mellitus with multiple risk factors for CHD but without clinically evident CHD Non-fatal MI, fatal and non-fatal stroke, revascularization procedures, hospitalization for congestive heart failure, and angina in adults with clinically evident CHD As an adjunct to diet to reduce low-",
+      "warnings": "5 WARNINGS AND PRECAUTIONS Myopathy and Rhabdomyolysis: Risk factors include age 65 years or greater, uncontrolled hypothyroidism, renal impairment, concomitant use with certain other drugs, and higher atorvastatin calcium dosage. Discontinue atorvastatin calcium if markedly elevated CK levels occur or myopathy is diagnosed or suspected. Temporarily discontinue atorvastatin calcium in patients experiencing an acute or serious condition at high risk of developing renal failure secondary to rhabdomyolysis. Inform patients of the risk of myopathy and rhabdomyolysis when starting or increasing ato",
+      "adverse_reactions": "6 ADVERSE REACTIONS The following important adverse reactions are described below and elsewhere in the labeling: Myopathy and Rhabdomyolysis [see Warnings and Precautions (5.1) ] Immune-Mediated Necrotizing Myopathy [see Warnings and Precautions (5.2) ] Hepatic Dysfunction [see Warnings and Precautions (5.3) ] Increases in HbA1c and Fasting Serum Glucose Levels [see Warnings and Precautions (5.4) ] Most common adverse reactions (incidence ≥5%) are nasopharyngitis, arthralgia, diarrhea, pain in extremity, and urinary tract infection ( 6.1 ). To report SUSPECTED ADVERSE REACTIONS, contact Novado",
+      "contraindications": "4 CONTRAINDICATIONS Acute liver failure or decompensated cirrhosis [see Warnings and Precautions (5.3) ] Hypersensitivity to atorvastatin or any excipients in atorvastatin calcium. Hypersensitivity reactions, including anaphylaxis, angioneurotic edema, erythema multiforme, Stevens-Johnson syndrome, and toxic epidermal necrolysis, have been reported [see Adverse Reactions (6.2) ]. Acute liver failure or decompensated cirrhosis ( 4 ). Hypersensitivity to atorvastatin or any excipient in atorvastatin calcium ( 4 )."
+    }
+  },
+  "Azithromycin": {
+    "use": "1 INDICATIONS AND USAGE Azithromycin is a macrolide antibacterial drug indicated for the treatment of patients with mild",
+    "category": "Antibiotic / Macrolide",
+    "icon": "🔶",
+    "mechanism": "12.1 Mechanism of Action Azithromycin is a macrolide antibacterial drug. [see ]",
+    "treats": "1 INDICATIONS AND USAGE Azithromycin is a macrolide antibacterial drug indicated for the treatment of patients with mild to moderate infections caused by susceptible strains of the designated microorg",
+    "description": "11 DESCRIPTION Azithromycin tablets USP contain the active ingredient azithromycin, a macrolide antibacterial drug, for oral administration. Azithromycin has the chemical name (2R,3S,4R,5R,8R,10R,11R,12S,13S,14R)-13-[(2,6-dideoxy-3-C-methyl-3-O-methyl-α-L-ribo-hexopyranosyl)oxy]-2-ethyl-3,4,10-trihy",
+    "avoid": [],
+    "caution": [],
+    "side_effects": "6 ADVERSE REACTIONS The following clinically significant adverse reactions are described elsewhere in labeling: • Hypersensitivity [see ] • Hepatotoxicity [see ] • Infantile Hypert",
+    "learn_more": "17 PATIENT COUNSELING INFORMATION Advise the patient to read the FDA-approved patient labeling (Patient Information). General Patient Counseling Azithromycin tablets can be taken with or without food.",
+    "did_you_know": [
+      "Azithromycin is classified as a Antibiotic / Macrolide.",
+      "17 PATIENT COUNSELING INFORMATION Advise the patient to read the FDA-approved patient labeling (Patient Information). General Patient Counseling Azith"
+    ],
+    "who_cannot": [
+      "4 CONTRAINDICATIONS",
+      "Patients with known hypersensitivity to azithromycin, erythromycin, any macrolide or ketolide drug. ()"
+    ],
+    "dosage_forms": [
+      "250 mg are white to off-white",
+      "modified capsule shaped",
+      "film-coated biconvex tablets",
+      "500 mg are white to off-white",
+      "oval shaped"
+    ],
+    "allergens": [
+      "Azithromycin"
+    ],
+    "age_caution": {
+      "child": "Consult a pediatric specialist for appropriate dosing.",
+      "elderly": "May require dose adjustment; monitor closely for side effects."
+    },
+    "pregnancy": "Consult a qualified healthcare professional before use during pregnancy.",
+    "breastfeeding": "Consult a qualified healthcare professional before use while breastfeeding.",
+    "sources": [
+      "FDA Drug Label — Azithromycin",
+      "OpenFDA.gov — Structured Product Labeling",
+      "DailyMed — National Library of Medicine"
+    ],
+    "confidence": "High",
+    "steps": [
+      {
+        "icon": "🔶",
+        "label": "Taken",
+        "desc": "Administered as directed"
+      },
+      {
+        "icon": "🩸",
+        "label": "Absorbed",
+        "desc": "Enters the bloodstream"
+      },
+      {
+        "icon": "🧬",
+        "label": "Acts",
+        "desc": "Antibiotic / Macrolide effect initiated"
+      },
+      {
+        "icon": "✨",
+        "label": "Effect",
+        "desc": "Therapeutic outcome achieved"
+      }
+    ],
+    "_fda_raw": {
+      "indications_and_usage": "1 INDICATIONS AND USAGE Azithromycin is a macrolide antibacterial drug indicated for the treatment of patients with mild to moderate infections caused by susceptible strains of the designated microorganisms in the specific conditions listed below. Recommended dosages and durations of therapy in adult and pediatric patient populations vary in these indications. [see Dosage and Administration (2) ] Azithromycin is a macrolide antibacterial drug indicated for mild to moderate infections caused by designated, susceptible bacteria: • Acute bacterial exacerbations of chronic bronchitis in adults () ",
+      "warnings": "5 WARNINGS AND PRECAUTIONS • Serious (including fatal) allergic and skin reactions: Discontinue azithromycin if reaction occurs. () • Hepatotoxicity: Severe, and sometimes fatal, hepatotoxicity has been reported. Discontinue azithromycin immediately if signs and symptoms of hepatitis occur. () • Infantile Hypertrophic Pyloric Stenosis (IHPS): Following the use of azithromycin in neonates (treatment up to 42 days of life), IHPS has been reported. Direct parents and caregivers to contact their physician if vomiting or irritability with feeding occurs. () • Prolongation of QT interval and cases o",
+      "adverse_reactions": "6 ADVERSE REACTIONS The following clinically significant adverse reactions are described elsewhere in labeling: • Hypersensitivity [see ] • Hepatotoxicity [see ] • Infantile Hypertrophic Pyloric Stenosis (IHPS) [see ] • QT Prolongation [see Warnings and Precautions (5.4) ] • Cardiovascular Death [see ] • Clostridioides difficile- Associated Diarrhea (CDAD) [see ] • Exacerbation of Myasthenia Gravis [see ] Most common adverse reactions are diarrhea (5 to 14%), nausea (3 to 18%), abdominal pain (3 to 7%), or vomiting (2 to 7%). ( ) To report SUSPECTED ADVERSE REACTIONS, contact Aurobindo Pharma ",
+      "contraindications": "4 CONTRAINDICATIONS • Patients with known hypersensitivity to azithromycin, erythromycin, any macrolide or ketolide drug. () • Patients with a history of cholestatic jaundice/hepatic dysfunction associated with prior use of azithromycin. () 4.1 Hypersensitivity Azithromycin tablets are contraindicated in patients with known hypersensitivity to azithromycin, erythromycin, any macrolide or ketolide drug. 4.2 Hepatic Dysfunction Azithromycin tablets are contraindicated in patients with a history of cholestatic jaundice/hepatic dysfunction associated with prior use of azithromycin."
+    }
+  },
+  "Metronidazole": {
+    "use": "Use Used for the adjuvant treatment of gingivitis, pericoronitis, oral mucositis and other causes of gingival bleeding, ",
+    "category": "Antibiotic / Antiprotozoal",
+    "icon": "🟢",
+    "mechanism": "Mechanism of action for Metronidazole (fetch from FDA label manually).",
+    "treats": "Use Used for the adjuvant treatment of gingivitis, pericoronitis, oral mucositis and other causes of gingival bleeding, periodontal abscess, oral mucosa ulcer, etc.",
+    "description": "",
+    "avoid": [],
+    "caution": [],
+    "side_effects": "See full FDA label for adverse reactions.",
+    "learn_more": "Warnings · Contraindicated for those who are allergic to this product and its ingredients · Should not be used for more than three consecutive courses.",
+    "did_you_know": [
+      "Metronidazole is classified as a Antibiotic / Antiprotozoal.",
+      "Always take Metronidazole as directed by your doctor or pharmacist."
+    ],
+    "who_cannot": [
+      "Patients with known hypersensitivity to Metronidazole"
+    ],
+    "dosage_forms": [
+      "Tablet",
+      "Capsule"
+    ],
+    "allergens": [
+      "Metronidazole"
+    ],
+    "age_caution": {
+      "child": "Consult a pediatric specialist for appropriate dosing.",
+      "elderly": "May require dose adjustment; monitor closely for side effects."
+    },
+    "pregnancy": "Consult a qualified healthcare professional before use during pregnancy.",
+    "breastfeeding": "Consult a qualified healthcare professional before use while breastfeeding.",
+    "sources": [
+      "FDA Drug Label — Metronidazole",
+      "OpenFDA.gov — Structured Product Labeling",
+      "DailyMed — National Library of Medicine"
+    ],
+    "confidence": "High",
+    "steps": [
+      {
+        "icon": "🟢",
+        "label": "Taken",
+        "desc": "Administered as directed"
+      },
+      {
+        "icon": "🩸",
+        "label": "Absorbed",
+        "desc": "Enters the bloodstream"
+      },
+      {
+        "icon": "🧬",
+        "label": "Acts",
+        "desc": "Antibiotic / Antiprotozoal effect initiated"
+      },
+      {
+        "icon": "✨",
+        "label": "Effect",
+        "desc": "Therapeutic outcome achieved"
+      }
+    ],
+    "_fda_raw": {
+      "indications_and_usage": "Use Used for the adjuvant treatment of gingivitis, pericoronitis, oral mucositis and other causes of gingival bleeding, periodontal abscess, oral mucosa ulcer, etc.",
+      "warnings": "Warnings · Contraindicated for those who are allergic to this product and its ingredients · Should not be used for more than three consecutive courses.",
+      "adverse_reactions": null,
+      "contraindications": null
+    }
+  }
+}

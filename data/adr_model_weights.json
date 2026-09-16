@@ -1,0 +1,149 @@
+{
+  "version": "2.0.0",
+  "model_architecture": "Logistic Regression with Clinically Calibrated Interaction Splines",
+  "reference_datasets": [
+    "PvPI (Indian Pharmacovigilance Program)",
+    "FDA FAERS 2020-2025",
+    "Beers Criteria 2023"
+  ],
+  "feature_names": [
+    "age_normalized",
+    "is_female",
+    "polypharmacy_count",
+    "renal_impairment",
+    "hepatic_impairment",
+    "has_hypertension",
+    "has_diabetes",
+    "has_ckd",
+    "has_peptic_ulcer",
+    "has_cardiovascular",
+    "drug_nsaid",
+    "drug_ace_arb",
+    "drug_beta_blocker",
+    "drug_statin",
+    "drug_metformin",
+    "drug_antibiotic_potent",
+    "drug_anticoagulant",
+    "drug_ppi",
+    "drug_sedative",
+    "drug_ayur_active"
+  ],
+  "coefficients": {
+    "overall_adr": {
+      "intercept": -2.4,
+      "weights": {
+        "age_normalized": 1.45,
+        "is_female": 0.18,
+        "polypharmacy_count": 2.1,
+        "renal_impairment": 1.35,
+        "hepatic_impairment": 1.5,
+        "has_hypertension": 0.45,
+        "has_diabetes": 0.55,
+        "has_ckd": 1.25,
+        "has_peptic_ulcer": 0.85,
+        "has_cardiovascular": 0.7,
+        "drug_nsaid": 1.1,
+        "drug_ace_arb": 0.65,
+        "drug_beta_blocker": 0.4,
+        "drug_statin": 0.5,
+        "drug_metformin": 0.45,
+        "drug_antibiotic_potent": 0.8,
+        "drug_anticoagulant": 1.3,
+        "drug_ppi": 0.35,
+        "drug_sedative": 1.05,
+        "drug_ayur_active": 0.6
+      },
+      "interaction_bonuses": [
+        {
+          "features": [
+            "drug_nsaid",
+            "drug_ace_arb"
+          ],
+          "weight": 1.65,
+          "reason": "NSAID + ACE/ARB synergism (Afferent vasoconstriction + Efferent dilation -> Renal crisis)"
+        },
+        {
+          "features": [
+            "drug_nsaid",
+            "drug_anticoagulant"
+          ],
+          "weight": 1.95,
+          "reason": "NSAID + Antiplatelet synergism (Platelet inhibition + Mucosal ulceration)"
+        },
+        {
+          "features": [
+            "drug_sedative",
+            "drug_ayur_active"
+          ],
+          "weight": 1.4,
+          "reason": "Sedative + Ayurvedic GABAergic herb synergy (Compounded CNS depression)"
+        },
+        {
+          "features": [
+            "drug_metformin",
+            "renal_impairment"
+          ],
+          "weight": 1.85,
+          "reason": "Metformin retention in renal compromise (Risk of Lactic Acidosis)"
+        },
+        {
+          "features": [
+            "drug_statin",
+            "hepatic_impairment"
+          ],
+          "weight": 1.3,
+          "reason": "Statin accumulation in hepatic insufficiency (Elevated transaminases)"
+        }
+      ]
+    },
+    "hazard_organ_subtypes": {
+      "nephrotoxicity": {
+        "intercept": -2.85,
+        "weights": {
+          "age_normalized": 1.2,
+          "renal_impairment": 2.2,
+          "has_ckd": 1.8,
+          "drug_nsaid": 1.9,
+          "drug_ace_arb": 1.4,
+          "drug_antibiotic_potent": 0.95
+        }
+      },
+      "hepatotoxicity": {
+        "intercept": -3.1,
+        "weights": {
+          "hepatic_impairment": 2.4,
+          "drug_statin": 1.1,
+          "drug_antibiotic_potent": 0.9,
+          "drug_ayur_active": 0.85
+        }
+      },
+      "gi_bleeding": {
+        "intercept": -2.95,
+        "weights": {
+          "age_normalized": 1.3,
+          "has_peptic_ulcer": 2.1,
+          "drug_nsaid": 2.05,
+          "drug_anticoagulant": 2.3
+        }
+      },
+      "cardiac_arrhythmia": {
+        "intercept": -3.2,
+        "weights": {
+          "age_normalized": 1.4,
+          "has_cardiovascular": 1.75,
+          "drug_antibiotic_potent": 1.6,
+          "drug_ace_arb": 0.8
+        }
+      },
+      "severe_hypoglycemia": {
+        "intercept": -3.0,
+        "weights": {
+          "has_diabetes": 1.8,
+          "drug_metformin": 1.5,
+          "drug_ayur_active": 1.2,
+          "renal_impairment": 1.1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SMASP — Smart Patient | Medicine Awareness</title>
+  <meta name="description" content="Understand your medicines in clear, calm, plain English. Free, offline, private, and 100% static on GitHub Pages." />
+  
+  <!-- PWA & Mobile Meta -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f6fff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="SMASP" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💊</text></svg>" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="app.css" />
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="navbar__inner">
+      <a href="app.html" class="navbar__logo">
+        <span class="navbar__logo-emoji">💊</span>
+        <span>SMASP <span class="navbar__logo-text">Smart Patient</span></span>
+      </a>
+      <div class="navbar__actions">
+        <button id="darkToggle" class="btn-icon" aria-label="Toggle Dark Mode" title="Toggle Dark/Light Mode">
+          🌙
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="mainContent">
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero__container">
+        <div class="hero__badge">✨ Calm Health Intelligence</div>
+        <h1 class="hero__title">Know Your <span class="hero__title-highlight">Medicine</span>.</h1>
+        <p class="hero__subtitle">
+          Explore 76+ medicines explained in simple, everyday language. No clinical jargon, no panic — just empowering clarity.
+        </p>
+
+        <!-- Search Bar -->
+        <div class="search-wrapper">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="searchInput"
+            class="search-input"
+            placeholder="Search by name, brand (e.g. Advil, Crocin), or symptom..."
+            aria-label="Search medicines"
+            autocomplete="off"
+          />
+          <button id="clearSearch" class="search-clear" aria-label="Clear search">✕</button>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="stats-row">
+          <div class="stat-item">
+            <span class="stat-number" id="medCount">76+</span>
+            <span class="stat-label">Medicines</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">6</span>
+            <span class="stat-label">Categories</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">100%</span>
+            <span class="stat-label">Free & Open</span>
+          </div>
+          <div class="stat-item">
+            <span class="stat-number">📶</span>
+            <span class="stat-label">Works Offline</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filter Category Chips -->
+    <div class="filter-section">
+      <div class="filter-label">Filter by Category</div>
+      <div class="category-chips" id="categoryChips" role="tablist" aria-label="Medicine categories">
+        <button class="chip active" data-category="all" role="tab" aria-selected="true">All</button>
+        <button class="chip" data-category="Pain / Fever" role="tab" aria-selected="false">🩹 Pain / Fever</button>
+        <button class="chip" data-category="Antibiotic" role="tab" aria-selected="false">🦠 Antibiotics</button>
+        <button class="chip" data-category="Stomach / GI" role="tab" aria-selected="false">🫃 Stomach / GI</button>
+        <button class="chip" data-category="Allergy / Cold" role="tab" aria-selected="false">🤧 Allergy / Cold</button>
+        <button class="chip" data-category="Chronic" role="tab" aria-selected="false">❤️ Chronic Care</button>
+        <button class="chip" data-category="Mental Health / Sleep" role="tab" aria-selected="false">🧠 Mental Health & Sleep</button>
+      </div>
+    </div>
+
+    <!-- Results Section -->
+    <section class="results-section">
+      <div class="results-header">
+        <h2 class="section-heading" id="resultsTitle" style="margin-bottom:0; font-size:1.35rem;">Popular Medicines</h2>
+        <span class="results-count" id="resultsCount">Loading catalog...</span>
+      </div>
+
+      <!-- Results Grid -->
+      <div class="results-grid" id="resultsGrid" aria-live="polite">
+        <!-- Skeleton Card 1 -->
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-badge"></div>
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-brands"></div>
+          <div class="skeleton skeleton-text"></div>
+          <div class="skeleton skeleton-text half"></div>
+          <div class="skeleton skeleton-link"></div>
+        </div>
+        <!-- Skeleton Card 2 -->
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-badge"></div>
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-brands"></div>
+          <div class="skeleton skeleton-text"></div>
+          <div class="skeleton skeleton-text half"></div>
+          <div class="skeleton skeleton-link"></div>
+        </div>
+        <!-- Skeleton Card 3 -->
+        <div class="skeleton-card">
+          <div class="skeleton skeleton-badge"></div>
+          <div class="skeleton skeleton-title"></div>
+          <div class="skeleton skeleton-brands"></div>
+          <div class="skeleton skeleton-text"></div>
+          <div class="skeleton skeleton-text half"></div>
+          <div class="skeleton skeleton-link"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Awareness Section -->
+    <section class="awareness-section">
+      <div class="awareness-inner">
+        <h2 class="section-heading text-center" style="text-align:center;">4 Golden Rules for Every Patient</h2>
+        <p class="section-sub text-center" style="text-align:center;">Simple guidelines to keep you and your loved ones safe.</p>
+        <div class="awareness-grid">
+          <div class="awareness-card">
+            <div class="awareness-card__icon">⏱️</div>
+            <div class="awareness-card__title">Finish Antibiotic Courses</div>
+            <p class="awareness-card__text">Stopping early can leave resistant bacteria alive, making future infections much harder to treat.</p>
+          </div>
+          <div class="awareness-card">
+            <div class="awareness-card__icon">🍱</div>
+            <div class="awareness-card__title">Stomach Protection</div>
+            <p class="awareness-card__text">Pain medicines like Ibuprofen can irritate your stomach lining. Always take them with food or milk.</p>
+          </div>
+          <div class="awareness-card">
+            <div class="awareness-card__icon">🔍</div>
+            <div class="awareness-card__title">Check Hidden Paracetamol</div>
+            <p class="awareness-card__text">Many cold and flu syrups contain paracetamol. Be careful not to take double the safe daily amount.</p>
+          </div>
+          <div class="awareness-card">
+            <div class="awareness-card__icon">🩺</div>
+            <div class="awareness-card__title">When in Doubt, Ask</div>
+            <p class="awareness-card__text">Pharmacists and doctors are there to help. Never hesitate to double-check dosage or interactions.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div class="site-footer__logo">💊 SMASP — Smart Patient</div>
+      <p class="site-footer__disclaimer">
+        <strong>⚠️ Educational Disclaimer:</strong> SMASP is an open educational platform designed for public health literacy. It does not provide medical diagnosis, prescription, or treatment advice. Always consult a qualified physician or pharmacist for medical decisions.
+      </p>
+      <div class="site-footer__copy">
+        © 2026 SMASP Project. Free, Open-Source, and 100% Static on GitHub Pages.
+      </div>
+    </div>
+  </footer>
+
+  <!-- App Script -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>

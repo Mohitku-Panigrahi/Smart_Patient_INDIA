@@ -1,0 +1,60 @@
+name: Validate & Test SMASP
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: JavaScript Syntax Verification
+        run: |
+          node --check smasp-engine.js
+          node --check app.js
+          node --check sw.js
+          node --check script.js
+          node --check js/data/medicines.js
+          node --check js/data/conditions.js
+          node --check js/data/interactions.js
+          node --check js/data/awarenessTips.js
+          node --check js/data/i18n.js
+          node --check js/engine/riskEngine.js
+          node --check js/engine/logger.js
+          node --check js/engine/speechEngine.js
+          node --check js/storage/storageManager.js
+          node --check js/ui/domUtils.js
+          node --check js/ui/components.js
+          node --check js/ui/excellence.js
+          node --check js/ui/homeView.js
+          node --check js/ui/resultView.js
+          node --check js/app.js
+
+      - name: Run Jest Test Suite
+        run: npx jest --verbose
+
+      - name: Smoke Checks (Static Assets)
+        run: |
+          test -f index.html
+          test -f result.html
+          test -f app.html
+          test -f medicine.html
+          test -f data/medicines.json
+          test -s style.css
+          test -s app.css

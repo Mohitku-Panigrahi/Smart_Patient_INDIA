@@ -1,0 +1,23 @@
+{
+  "name": "smart-patient",
+  "version": "2.1.0",
+  "description": "Smart Medicine Awareness & Safety Platform — Patient Health Literacy & DDI Risk Analysis",
+  "main": "js/app.js",
+  "scripts": {
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --watch"
+  },
+  "keywords": [
+    "healthcare",
+    "medicine-safety",
+    "patient-literacy",
+    "pharmacology",
+    "ddi-checker"
+  ],
+  "author": "SMASP Project",
+  "license": "MIT",
+  "devDependencies": {
+    "jest": "^29.7.0"
+  }
+}
